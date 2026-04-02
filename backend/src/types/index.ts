@@ -15,7 +15,7 @@ export interface MatchEvent {
   timestamp: string; // ISO 8601
   teamId: string;
   playerId?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface Room {
@@ -65,6 +65,21 @@ export interface WrappedRecap {
   shareableUrl: string;
 }
 
+export interface Prediction {
+  userId: string;
+  roomId: string;
+  windowId: string;
+  predictionType:
+    | 'next_goal_scorer'
+    | 'next_card'
+    | 'next_corner'
+    | 'match_outcome';
+  choice: string;
+  submittedAt: string; // ISO 8601
+  isCorrect?: boolean;
+  pointsAwarded?: number;
+}
+
 export interface RoomRecap {
   roomId: string;
   matchId: string;
@@ -72,4 +87,15 @@ export interface RoomRecap {
   topPerformers: UserScore[];
   mostPredictedEvent: string;
   engagementMetrics: Record<string, number>;
+}
+
+// WebSocket Message Types
+export interface WebSocketMessage {
+  action:
+    | 'createRoom'
+    | 'joinRoom'
+    | 'submitPrediction'
+    | 'leaveRoom'
+    | 'heartbeat';
+  payload: Record<string, unknown>;
 }

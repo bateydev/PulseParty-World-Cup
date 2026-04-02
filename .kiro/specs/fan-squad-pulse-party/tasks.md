@@ -44,8 +44,8 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 ### Phase 2: Backend Core Implementation
 
-- [ ] 3. Implement shared types and utilities
-  - [-] 3.1 Create TypeScript interfaces for all data models
+- [x] 3. Implement shared types and utilities
+  - [x] 3.1 Create TypeScript interfaces for all data models
     - Define MatchEvent, Room, PredictionWindow, UserScore, Prediction, WrappedRecap, RoomRecap interfaces
     - Define WebSocketMessage action types
     - _Requirements: 2.1, 10.3, 10.4, 10.5_
@@ -56,13 +56,13 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 40: Leaderboard entity structure**
     - **Validates: Requirements 10.3, 10.4, 10.5**
   
-  - [ ] 3.3 Create DynamoDB helper utilities
+  - [x] 3.3 Create DynamoDB helper utilities
     - Write functions for put, get, query, update operations with error handling
     - Implement retry logic with exponential backoff for throttling
     - _Requirements: 10.6, 10.7_
 
-- [ ] 4. Implement Ingestion Lambda
-  - [ ] 4.1 Create XML parser for match event feed
+- [x] 4. Implement Ingestion Lambda
+  - [x] 4.1 Create XML parser for match event feed
     - Write parseXMLEvent function to extract event type, timestamp, team, player
     - Implement error handling for malformed XML
     - _Requirements: 2.1, 11.1, 11.2, 11.3_
@@ -71,7 +71,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 7: XML event parsing**
     - **Validates: Requirements 2.1, 11.1, 11.2**
   
-  - [ ] 4.3 Create event normalization function
+  - [x] 4.3 Create event normalization function
     - Write normalizeEvent function to convert parsed XML to standardized JSON schema
     - Validate required fields (event_type, timestamp, match_id)
     - _Requirements: 2.2, 11.4, 11.5_
@@ -82,7 +82,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 44: Event serialization round-trip**
     - **Validates: Requirements 2.2, 11.4, 11.5, 11.6, 11.8**
   
-  - [ ] 4.5 Implement EventBridge publisher
+  - [x] 4.5 Implement EventBridge publisher
     - Write publishToEventBridge function with match ID routing attribute
     - Add retry logic with exponential backoff (3 attempts)
     - _Requirements: 2.3, 12.1, 12.5_
@@ -91,7 +91,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 45: EventBridge message metadata**
     - **Validates: Requirements 12.1, 12.5**
   
-  - [ ] 4.7 Implement simulator mode fallback
+  - [x] 4.7 Implement simulator mode fallback
     - Create recorded event replay mechanism with realistic timing
     - Add environment variable to toggle simulator mode
     - _Requirements: 2.7, 2.8, 13.8_
@@ -101,7 +101,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test error handling for malformed XML
     - Test simulator mode activation
 
-- [ ] 5. Checkpoint - Validate ingestion pipeline
+- [x] 5. Checkpoint - Validate ingestion pipeline
   - Deploy Ingestion Lambda to AWS
   - Test with sample XML events
   - Verify events published to EventBridge
@@ -109,7 +109,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 
 - [ ] 6. Implement Room State Lambda
-  - [ ] 6.1 Create room management functions
+  - [x] 6.1 Create room management functions
     - Write createRoom function to generate unique room code and store in DynamoDB
     - Write getRoomByCode function to query room by code
     - Write getActiveRoomsByMatch function to query rooms by match ID
@@ -122,7 +122,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 5: Invalid room code rejection**
     - **Validates: Requirements 1.1, 1.3, 1.4, 1.5**
   
-  - [ ] 6.3 Implement room theme validation and discovery
+  - [-] 6.3 Implement room theme validation and discovery
     - Write validateTheme function to check theme is in {Country, Club, Private}
     - Write discoverRooms function using GSI1 for public room discovery
     - _Requirements: 1.2, 1.7, 1.8_

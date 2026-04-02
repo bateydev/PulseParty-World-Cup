@@ -10,5 +10,6 @@ new PulsePartyStack(app, 'PulsePartyStack', {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
   },
-  description: 'PulseParty Rooms - Real-time social multiplayer fan experience platform',
+  description:
+    'PulseParty Rooms - Real-time social multiplayer fan experience platform',
 });

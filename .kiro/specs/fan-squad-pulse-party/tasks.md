@@ -17,25 +17,25 @@ The implementation follows an incremental approach: infrastructure setup → bac
   - Configure ESLint and Prettier for code quality
   - _Requirements: All_
 
-- [ ] 2. Set up AWS infrastructure with CDK or SAM
+- [x] 2. Set up AWS infrastructure with CDK or SAM
   - [x] 2.1 Define DynamoDB single-table with GSI for match+theme discovery
     - Create table with PK, SK, GSI1PK, GSI1SK, and TTL attribute
     - Configure on-demand billing mode
     - _Requirements: 10.1, 10.2, 10.9_
   
-  - [-] 2.2 Define EventBridge event bus and routing rules
+  - [x] 2.2 Define EventBridge event bus and routing rules
     - Create custom event bus for match events
     - Define routing rules by match ID to target Lambda functions
     - Configure dead-letter queue for failed events
     - _Requirements: 12.1, 12.2, 12.7_
   
-  - [ ] 2.3 Define API Gateway WebSocket API
+  - [x] 2.3 Define API Gateway WebSocket API
     - Create WebSocket API with $connect, $disconnect, $default routes
     - Configure Lambda integrations for each route
     - Set up CloudWatch logging
     - _Requirements: 9.1_
   
-  - [ ] 2.4 Define Lambda functions with IAM roles
+  - [x] 2.4 Define Lambda functions with IAM roles
     - Create 6 Lambda function definitions: Ingestion, RoomState, MomentEngine, Scoring, Recap, WebSocket handlers
     - Configure environment variables (table name, event bus name, API Gateway endpoint)
     - Set up IAM roles with least-privilege permissions
@@ -45,7 +45,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
 ### Phase 2: Backend Core Implementation
 
 - [ ] 3. Implement shared types and utilities
-  - [ ] 3.1 Create TypeScript interfaces for all data models
+  - [-] 3.1 Create TypeScript interfaces for all data models
     - Define MatchEvent, Room, PredictionWindow, UserScore, Prediction, WrappedRecap, RoomRecap interfaces
     - Define WebSocketMessage action types
     - _Requirements: 2.1, 10.3, 10.4, 10.5_

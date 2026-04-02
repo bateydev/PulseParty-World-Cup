@@ -1,6 +1,11 @@
 import { putItem, queryItems } from '../utils/dynamodb';
 import { Room } from '../types';
 import { randomBytes } from 'crypto';
+import {
+  ApiGatewayManagementApiClient,
+  PostToConnectionCommand,
+  GoneException,
+} from '@aws-sdk/client-apigatewaymanagementapi';
 
 const TABLE_NAME = process.env.TABLE_NAME || 'PulsePartyTable';
 
@@ -165,7 +170,9 @@ export async function getActiveRoomsByMatch(
  * @param theme - The theme to validate
  * @returns true if valid, false otherwise
  */
-export function validateTheme(theme: string): theme is 'Country' | 'Club' | 'Private' {
+export function validateTheme(
+  theme: string
+): theme is 'Country' | 'Club' | 'Private' {
   return theme === 'Country' || theme === 'Club' || theme === 'Private';
 }
 
@@ -211,4 +218,112 @@ export async function discoverRooms(matchId: string): Promise<Room[]> {
     };
     return roomData as Room;
   });
+}
+
+/**
+ * Broadcast an event to all participants in a room via WebSocket
+ * Requirements: 2.4, 2.5, 12.3, 12.4
+ *
+ * @param roomId - The room identifier
+ * @param message - The message payload to broadcast
+ * @param maxRetries - Maximum number of retry attempts for transient failures (default: 3)
+ * @returns Object containing success count and failed connection IDs
+ */
+export async function broadcastToRoom(
+  roomId: string,
+  message: unknown,
+  maxRetries: number = 3
+): Promise<{ successCount: number; failedConnections: string[] }> {
+  // Get room to retrieve participant connection IDs
+  const rooms = await queryItems<Room & { PK: string; SK: string }>({
+    TableName: TABLE_NAME,
+    KeyConditionExpression: 'PK = :pk AND SK = :sk',
+    ExpressionAttributeValues: {
+      ':pk': `ROOM#${roomId}`,
+      ':sk': 'METADATA',
+    },
+  });
+
+  if (rooms.length === 0) {
+    throw new Error(`Room not found: ${roomId}`);
+  }
+
+  const room = rooms[0];
+  const participants = room.participants || [];
+
+  if (participants.length === 0) {
+    return { successCount: 0, failedConnections: [] };
+  }
+
+  // Initialize API Gateway Management API client
+  const wsEndpoint = process.env.WEBSOCKET_API_ENDPOINT || '';
+  const client = new ApiGatewayManagementApiClient({
+    endpoint: wsEndpoint.replace('wss://', 'https://'),
+  });
+
+  const messageData = JSON.stringify(message);
+  const failedConnections: string[] = [];
+  let successCount = 0;
+
+  // Broadcast to all participants
+  await Promise.all(
+    participants.map(async (connectionId) => {
+      let attempts = 0;
+      let success = false;
+
+      while (attempts < maxRetries && !success) {
+        try {
+          const command = new PostToConnectionCommand({
+            ConnectionId: connectionId,
+            Data: Buffer.from(messageData),
+          });
+
+          await client.send(command);
+          success = true;
+          successCount++;
+        } catch (error) {
+          attempts++;
+
+          // Handle stale connections (410 Gone)
+          if (error instanceof GoneException) {
+            console.warn(
+              `Stale connection detected: ${connectionId}. Marking for removal.`
+            );
+            failedConnections.push(connectionId);
+            break; // Don't retry for stale connections
+          }
+
+          // Retry for transient failures
+          if (attempts < maxRetries) {
+            // Exponential backoff: 100ms, 200ms, 400ms
+            const backoffMs = 100 * Math.pow(2, attempts - 1);
+            await new Promise((resolve) => setTimeout(resolve, backoffMs));
+          } else {
+            console.error(
+              `Failed to send message to ${connectionId} after ${maxRetries} attempts:`,
+              error
+            );
+            failedConnections.push(connectionId);
+          }
+        }
+      }
+    })
+  );
+
+  // Remove stale connections from room participants
+  if (failedConnections.length > 0) {
+    const updatedParticipants = participants.filter(
+      (id) => !failedConnections.includes(id)
+    );
+
+    await putItem({
+      TableName: TABLE_NAME,
+      Item: {
+        ...room,
+        participants: updatedParticipants,
+      },
+    });
+  }
+
+  return { successCount, failedConnections };
 }

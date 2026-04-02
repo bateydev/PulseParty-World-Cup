@@ -122,7 +122,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 5: Invalid room code rejection**
     - **Validates: Requirements 1.1, 1.3, 1.4, 1.5**
   
-  - [-] 6.3 Implement room theme validation and discovery
+  - [x] 6.3 Implement room theme validation and discovery
     - Write validateTheme function to check theme is in {Country, Club, Private}
     - Write discoverRooms function using GSI1 for public room discovery
     - _Requirements: 1.2, 1.7, 1.8_
@@ -132,7 +132,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 6: Room discovery by theme**
     - **Validates: Requirements 1.2, 1.7, 1.8**
   
-  - [ ] 6.5 Implement event distribution to rooms
+  - [x] 6.5 Implement event distribution to rooms
     - Write broadcastToRoom function to send events via WebSocket
     - Query active rooms by match ID and broadcast to all participants
     - _Requirements: 2.4, 2.5, 12.3, 12.4_

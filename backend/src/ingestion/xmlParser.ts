@@ -4,7 +4,7 @@ import { MatchEvent } from '../types';
 /**
  * XML Parser for match event feed
  * Extracts event data from XML format and converts to MatchEvent interface
- * 
+ *
  * Requirements:
  * - 2.1: Parse XML data and extract event type, timestamp, team, player within 200ms
  * - 11.1: Parse XML structure and extract all MatchEvent nodes
@@ -56,12 +56,13 @@ export function parseXMLEvent(xml: string): ParseResult {
         // Log error with XML snippet and continue processing (Requirement 11.3)
         const xmlSnippet = xml.substring(0, 200); // First 200 chars as snippet
         const parseError: XMLParseError = {
-          message: error instanceof Error ? error.message : 'Unknown parsing error',
+          message:
+            error instanceof Error ? error.message : 'Unknown parsing error',
           xmlSnippet,
           timestamp: new Date().toISOString(),
         };
         errors.push(parseError);
-        
+
         // Log to console for CloudWatch
         console.error('XML parsing error:', {
           error: parseError.message,
@@ -79,7 +80,7 @@ export function parseXMLEvent(xml: string): ParseResult {
       timestamp: new Date().toISOString(),
     };
     errors.push(parseError);
-    
+
     console.error('Critical XML parsing error:', {
       error: parseError.message,
       snippet: parseError.xmlSnippet,
@@ -103,13 +104,15 @@ function extractEventNodes(parsed: any): any[] {
   // Check for common root elements
   if (parsed.events?.event) {
     // <events><event>...</event><event>...</event></events>
-    return Array.isArray(parsed.events.event) ? parsed.events.event : [parsed.events.event];
+    return Array.isArray(parsed.events.event)
+      ? parsed.events.event
+      : [parsed.events.event];
   }
 
   if (parsed.matchEvents?.matchEvent) {
     // <matchEvents><matchEvent>...</matchEvent></matchEvents>
-    return Array.isArray(parsed.matchEvents.matchEvent) 
-      ? parsed.matchEvents.matchEvent 
+    return Array.isArray(parsed.matchEvents.matchEvent)
+      ? parsed.matchEvents.matchEvent
       : [parsed.matchEvents.matchEvent];
   }
 
@@ -120,7 +123,9 @@ function extractEventNodes(parsed: any): any[] {
 
   if (parsed.matchEvent) {
     // <matchEvent>...</matchEvent>
-    return Array.isArray(parsed.matchEvent) ? parsed.matchEvent : [parsed.matchEvent];
+    return Array.isArray(parsed.matchEvent)
+      ? parsed.matchEvent
+      : [parsed.matchEvent];
   }
 
   // If no recognized structure, return empty array
@@ -180,29 +185,30 @@ function parseEventNode(eventNode: any): MatchEvent {
  * Extract and normalize event type from event node
  */
 function extractEventType(node: any): MatchEvent['eventType'] | null {
-  const rawType = node.eventType || node.type || node['@_type'] || node.event_type;
-  
+  const rawType =
+    node.eventType || node.type || node['@_type'] || node.event_type;
+
   if (!rawType) {
     return null;
   }
 
   // Normalize to lowercase and map to valid event types
   const normalized = String(rawType).toLowerCase().trim();
-  
+
   const typeMap: Record<string, MatchEvent['eventType']> = {
-    'goal': 'goal',
-    'assist': 'assist',
-    'yellow_card': 'yellow_card',
-    'yellowcard': 'yellow_card',
-    'yellow': 'yellow_card',
-    'red_card': 'red_card',
-    'redcard': 'red_card',
-    'red': 'red_card',
-    'substitution': 'substitution',
-    'sub': 'substitution',
-    'corner': 'corner',
-    'shot': 'shot',
-    'possession': 'possession',
+    goal: 'goal',
+    assist: 'assist',
+    yellow_card: 'yellow_card',
+    yellowcard: 'yellow_card',
+    yellow: 'yellow_card',
+    red_card: 'red_card',
+    redcard: 'red_card',
+    red: 'red_card',
+    substitution: 'substitution',
+    sub: 'substitution',
+    corner: 'corner',
+    shot: 'shot',
+    possession: 'possession',
   };
 
   return typeMap[normalized] || null;
@@ -212,8 +218,9 @@ function extractEventType(node: any): MatchEvent['eventType'] | null {
  * Extract and normalize timestamp from event node
  */
 function extractTimestamp(node: any): string | null {
-  const rawTimestamp = node.timestamp || node.time || node['@_timestamp'] || node.event_time;
-  
+  const rawTimestamp =
+    node.timestamp || node.time || node['@_timestamp'] || node.event_time;
+
   if (!rawTimestamp) {
     return null;
   }
@@ -234,7 +241,9 @@ function extractTimestamp(node: any): string | null {
  * Extract match ID from event node
  */
 function extractMatchId(node: any): string | null {
-  return node.matchId || node.match_id || node['@_matchId'] || node.match || null;
+  return (
+    node.matchId || node.match_id || node['@_matchId'] || node.match || null
+  );
 }
 
 /**
@@ -249,7 +258,7 @@ function extractTeamId(node: any): string | null {
  */
 function extractEventId(node: any): string {
   const id = node.eventId || node.event_id || node['@_eventId'] || node.id;
-  
+
   if (id) {
     return String(id);
   }
@@ -262,7 +271,8 @@ function extractEventId(node: any): string {
  * Extract player ID from event node (optional)
  */
 function extractPlayerId(node: any): string | undefined {
-  const playerId = node.playerId || node.player_id || node['@_playerId'] || node.player;
+  const playerId =
+    node.playerId || node.player_id || node['@_playerId'] || node.player;
   return playerId ? String(playerId) : undefined;
 }
 
@@ -274,13 +284,30 @@ function extractMetadata(node: any): Record<string, any> {
 
   // List of known fields to exclude from metadata
   const knownFields = new Set([
-    'eventId', 'event_id', 'id',
-    'matchId', 'match_id', 'match',
-    'eventType', 'type', 'event_type',
-    'timestamp', 'time', 'event_time',
-    'teamId', 'team_id', 'team',
-    'playerId', 'player_id', 'player',
-    '@_eventId', '@_matchId', '@_type', '@_timestamp', '@_teamId', '@_playerId',
+    'eventId',
+    'event_id',
+    'id',
+    'matchId',
+    'match_id',
+    'match',
+    'eventType',
+    'type',
+    'event_type',
+    'timestamp',
+    'time',
+    'event_time',
+    'teamId',
+    'team_id',
+    'team',
+    'playerId',
+    'player_id',
+    'player',
+    '@_eventId',
+    '@_matchId',
+    '@_type',
+    '@_timestamp',
+    '@_teamId',
+    '@_playerId',
   ]);
 
   // Extract any additional fields as metadata

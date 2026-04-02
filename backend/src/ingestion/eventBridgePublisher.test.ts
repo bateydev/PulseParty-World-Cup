@@ -1,5 +1,8 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals';
-import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
+import {
+  EventBridgeClient,
+  PutEventsCommand,
+} from '@aws-sdk/client-eventbridge';
 import { mockClient } from 'aws-sdk-client-mock';
 import {
   publishToEventBridge,
@@ -71,7 +74,9 @@ describe('EventBridge Publisher', () => {
       await publishToEventBridge(mockEvent);
 
       const calls = eventBridgeMock.commandCalls(PutEventsCommand);
-      const detail = JSON.parse(calls[0].args[0].input.Entries?.[0]?.Detail || '{}');
+      const detail = JSON.parse(
+        calls[0].args[0].input.Entries?.[0]?.Detail || '{}'
+      );
 
       expect(detail.metadata.priority).toBe('high'); // goal is high priority
       expect(detail.metadata.publishedAt).toBeDefined();
@@ -88,7 +93,9 @@ describe('EventBridge Publisher', () => {
       await publishToEventBridge(goalEvent);
 
       const calls = eventBridgeMock.commandCalls(PutEventsCommand);
-      const detail = JSON.parse(calls[0].args[0].input.Entries?.[0]?.Detail || '{}');
+      const detail = JSON.parse(
+        calls[0].args[0].input.Entries?.[0]?.Detail || '{}'
+      );
       expect(detail.metadata.priority).toBe('high');
     });
 
@@ -102,7 +109,9 @@ describe('EventBridge Publisher', () => {
       await publishToEventBridge(redCardEvent);
 
       const calls = eventBridgeMock.commandCalls(PutEventsCommand);
-      const detail = JSON.parse(calls[0].args[0].input.Entries?.[0]?.Detail || '{}');
+      const detail = JSON.parse(
+        calls[0].args[0].input.Entries?.[0]?.Detail || '{}'
+      );
       expect(detail.metadata.priority).toBe('high');
     });
 
@@ -119,7 +128,9 @@ describe('EventBridge Publisher', () => {
       await publishToEventBridge(yellowCardEvent);
 
       const calls = eventBridgeMock.commandCalls(PutEventsCommand);
-      const detail = JSON.parse(calls[0].args[0].input.Entries?.[0]?.Detail || '{}');
+      const detail = JSON.parse(
+        calls[0].args[0].input.Entries?.[0]?.Detail || '{}'
+      );
       expect(detail.metadata.priority).toBe('medium');
     });
 
@@ -136,7 +147,9 @@ describe('EventBridge Publisher', () => {
       await publishToEventBridge(possessionEvent);
 
       const calls = eventBridgeMock.commandCalls(PutEventsCommand);
-      const detail = JSON.parse(calls[0].args[0].input.Entries?.[0]?.Detail || '{}');
+      const detail = JSON.parse(
+        calls[0].args[0].input.Entries?.[0]?.Detail || '{}'
+      );
       expect(detail.metadata.priority).toBe('low');
     });
 
@@ -219,7 +232,9 @@ describe('EventBridge Publisher', () => {
       await publishToEventBridge(mockEvent);
 
       const calls = eventBridgeMock.commandCalls(PutEventsCommand);
-      const detail = JSON.parse(calls[0].args[0].input.Entries?.[0]?.Detail || '{}');
+      const detail = JSON.parse(
+        calls[0].args[0].input.Entries?.[0]?.Detail || '{}'
+      );
 
       expect(detail.eventId).toBe('evt-123');
       expect(detail.matchId).toBe('match-456');

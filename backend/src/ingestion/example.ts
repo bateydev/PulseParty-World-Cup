@@ -1,6 +1,6 @@
 /**
  * Example: XML Parser + Normalizer Integration
- * 
+ *
  * This example demonstrates how to use the XML parser and normalizer together
  * to process match event feeds.
  */
@@ -47,7 +47,7 @@ export function processMatchEventFeed(xml: string): void {
   // Step 1: Parse XML
   console.log('Step 1: Parsing XML...');
   const parseResult = parseXMLEvent(xml);
-  
+
   console.log(`✓ Parsed ${parseResult.events.length} events`);
   if (parseResult.errors.length > 0) {
     console.log(`⚠ ${parseResult.errors.length} parsing errors occurred`);
@@ -60,10 +60,10 @@ export function processMatchEventFeed(xml: string): void {
   // Step 2: Normalize events
   console.log('Step 2: Normalizing events...');
   const normalizeResults = normalizeEvents(parseResult.events);
-  
+
   const validCount = normalizeResults.filter((r) => r.isValid).length;
   const invalidCount = normalizeResults.length - validCount;
-  
+
   console.log(`✓ ${validCount} valid events`);
   if (invalidCount > 0) {
     console.log(`⚠ ${invalidCount} invalid events`);
@@ -81,7 +81,7 @@ export function processMatchEventFeed(xml: string): void {
   // Step 3: Extract valid events
   console.log('Step 3: Extracting valid events...');
   const validEvents = getValidEvents(normalizeResults);
-  
+
   console.log(`✓ ${validEvents.length} events ready for processing\n`);
 
   // Step 4: Display processed events

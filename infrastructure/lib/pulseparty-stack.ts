@@ -486,14 +486,8 @@ export class PulsePartyStack extends cdk.Stack {
     this.connectFunction = new lambda.Function(this, 'ConnectHandler', {
       functionName: 'PulseParty-Connect',
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Connect event:', JSON.stringify(event));
-          // TODO: Store connection ID in DynamoDB (Task 7.1)
-          return { statusCode: 200, body: 'Connected' };
-        };
-      `),
+      handler: 'websocket/handleConnect.handler',
+      code: lambda.Code.fromAsset('../backend/dist'),
       role: lambdaExecutionRole,
       environment: {
         TABLE_NAME: this.table.tableName,

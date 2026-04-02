@@ -49,7 +49,12 @@ describe('DynamoDB Utilities', () => {
     it('should retry on throttling error and succeed', async () => {
       ddbMock
         .on(PutCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({});
 
       await putItem({
@@ -153,7 +158,12 @@ describe('DynamoDB Utilities', () => {
       const mockItem = { PK: 'ROOM#123', SK: 'METADATA' };
       ddbMock
         .on(GetCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({ Item: mockItem });
 
       const result = await getItem({
@@ -213,7 +223,12 @@ describe('DynamoDB Utilities', () => {
       const mockItems = [{ PK: 'ROOM#123', SK: 'SCORE#user1' }];
       ddbMock
         .on(QueryCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({ Items: mockItems });
 
       const result = await queryItems({
@@ -231,7 +246,7 @@ describe('DynamoDB Utilities', () => {
     it('should return items and lastEvaluatedKey', async () => {
       const mockItems = [{ PK: 'ROOM#123', SK: 'SCORE#user1' }];
       const mockLastKey = { PK: 'ROOM#123', SK: 'SCORE#user1' };
-      
+
       ddbMock.on(QueryCommand).resolves({
         Items: mockItems,
         LastEvaluatedKey: mockLastKey,
@@ -298,7 +313,12 @@ describe('DynamoDB Utilities', () => {
       const updatedItem = { PK: 'ROOM#123', SK: 'SCORE#user1', points: 150 };
       ddbMock
         .on(UpdateCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({ Attributes: updatedItem });
 
       const result = await updateItem({
@@ -329,7 +349,12 @@ describe('DynamoDB Utilities', () => {
     it('should retry on throttling error', async () => {
       ddbMock
         .on(DeleteCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({});
 
       await deleteItem({
@@ -347,7 +372,7 @@ describe('DynamoDB Utilities', () => {
         { PK: 'ROOM#123', SK: 'METADATA' },
         { PK: 'ROOM#456', SK: 'METADATA' },
       ];
-      
+
       ddbMock.on(BatchGetCommand).resolves({
         Responses: { TestTable: mockItems },
       });
@@ -379,10 +404,15 @@ describe('DynamoDB Utilities', () => {
 
     it('should retry on throttling error', async () => {
       const mockItems = [{ PK: 'ROOM#123', SK: 'METADATA' }];
-      
+
       ddbMock
         .on(BatchGetCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({ Responses: { TestTable: mockItems } });
 
       const result = await batchGetItems('TestTable', [
@@ -425,7 +455,12 @@ describe('DynamoDB Utilities', () => {
     it('should retry on throttling error', async () => {
       ddbMock
         .on(BatchWriteCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({});
 
       await batchWriteItems('TestTable', [
@@ -484,7 +519,12 @@ describe('DynamoDB Utilities', () => {
     it('should retry on throttling error', async () => {
       ddbMock
         .on(TransactWriteCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({});
 
       await transactWrite([
@@ -503,7 +543,12 @@ describe('DynamoDB Utilities', () => {
     it('should not retry on conditional check failure', async () => {
       ddbMock
         .on(TransactWriteCommand)
-        .rejects(new ConditionalCheckFailedException({ message: 'Condition failed', $metadata: {} }));
+        .rejects(
+          new ConditionalCheckFailedException({
+            message: 'Condition failed',
+            $metadata: {},
+          })
+        );
 
       await expect(
         transactWrite([
@@ -525,11 +570,21 @@ describe('DynamoDB Utilities', () => {
   describe('Retry logic', () => {
     it('should implement exponential backoff', async () => {
       const startTime = Date.now();
-      
+
       ddbMock
         .on(GetCommand)
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
-        .rejectsOnce(new ProvisionedThroughputExceededException({ message: 'Throttled', $metadata: {} }))
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
+        .rejectsOnce(
+          new ProvisionedThroughputExceededException({
+            message: 'Throttled',
+            $metadata: {},
+          })
+        )
         .resolves({ Item: { PK: 'ROOM#123' } });
 
       await getItem({
@@ -538,7 +593,7 @@ describe('DynamoDB Utilities', () => {
       });
 
       const elapsed = Date.now() - startTime;
-      
+
       // Should have some delay due to backoff (at least a few milliseconds)
       // We can't test exact timing due to jitter, but should be > 0
       expect(elapsed).toBeGreaterThan(0);

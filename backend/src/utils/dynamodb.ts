@@ -58,7 +58,7 @@ function isRetryableError(error: unknown): boolean {
   if (error instanceof ProvisionedThroughputExceededException) {
     return true;
   }
-  
+
   // Check for transient errors
   if (error instanceof Error) {
     const errorName = error.name;
@@ -69,7 +69,7 @@ function isRetryableError(error: unknown): boolean {
       errorName === 'ThrottlingException'
     );
   }
-  
+
   return false;
 }
 
@@ -81,34 +81,37 @@ async function executeWithRetry<T>(
   operationName: string
 ): Promise<T> {
   let lastError: unknown;
-  
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       return await operation();
     } catch (error) {
       lastError = error;
-      
+
       // Don't retry non-retryable errors
       if (!isRetryableError(error)) {
         throw error;
       }
-      
+
       // Don't retry on last attempt
       if (attempt === MAX_RETRIES - 1) {
         break;
       }
-      
+
       const delay = calculateBackoffDelay(attempt);
       console.warn(
         `${operationName} failed (attempt ${attempt + 1}/${MAX_RETRIES}), retrying in ${delay}ms`,
         error
       );
-      
+
       await sleep(delay);
     }
   }
-  
-  console.error(`${operationName} failed after ${MAX_RETRIES} attempts`, lastError);
+
+  console.error(
+    `${operationName} failed after ${MAX_RETRIES} attempts`,
+    lastError
+  );
   throw lastError;
 }
 
@@ -189,9 +192,7 @@ export async function updateItem<T = Record<string, unknown>>(
 /**
  * Delete item from DynamoDB
  */
-export async function deleteItem(
-  params: DeleteCommandInput
-): Promise<void> {
+export async function deleteItem(params: DeleteCommandInput): Promise<void> {
   await executeWithRetry(async () => {
     const command = new DeleteCommand(params);
     await docClient.send(command);
@@ -209,11 +210,11 @@ export async function batchGetItems<T = Record<string, unknown>>(
   if (keys.length === 0) {
     return [];
   }
-  
+
   if (keys.length > 100) {
     throw new Error('BatchGet supports maximum 100 items');
   }
-  
+
   return executeWithRetry(async () => {
     const { BatchGetCommand } = await import('@aws-sdk/lib-dynamodb');
     const command = new BatchGetCommand({
@@ -223,7 +224,7 @@ export async function batchGetItems<T = Record<string, unknown>>(
         },
       },
     });
-    
+
     const result = await docClient.send(command);
     return (result.Responses?.[tableName] as T[]) || [];
   }, 'batchGetItems');
@@ -240,11 +241,11 @@ export async function batchWriteItems(
   if (items.length === 0) {
     return;
   }
-  
+
   if (items.length > 25) {
     throw new Error('BatchWrite supports maximum 25 items');
   }
-  
+
   await executeWithRetry(async () => {
     const { BatchWriteCommand } = await import('@aws-sdk/lib-dynamodb');
     const command = new BatchWriteCommand({
@@ -258,7 +259,7 @@ export async function batchWriteItems(
         }),
       },
     });
-    
+
     await docClient.send(command);
   }, 'batchWriteItems');
 }
@@ -276,11 +277,11 @@ export async function transactWrite(
   if (items.length === 0) {
     return;
   }
-  
+
   if (items.length > 100) {
     throw new Error('TransactWrite supports maximum 100 items');
   }
-  
+
   await executeWithRetry(async () => {
     const { TransactWriteCommand } = await import('@aws-sdk/lib-dynamodb');
     const transactItems = items.map((item) => {
@@ -297,11 +298,11 @@ export async function transactWrite(
           throw new Error(`Unknown transaction type: ${item.type}`);
       }
     });
-    
+
     const command = new TransactWriteCommand({
       TransactItems: transactItems as any,
     });
-    
+
     await docClient.send(command);
   }, 'transactWrite');
 }

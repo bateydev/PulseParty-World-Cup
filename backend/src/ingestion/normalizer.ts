@@ -151,5 +151,7 @@ export function normalizeEvents(
  * @returns Array of valid MatchEvent objects
  */
 export function getValidEvents(results: NormalizedResult[]): MatchEvent[] {
-  return results.filter((result) => result.isValid).map((result) => result.event!);
+  return results
+    .filter((result) => result.isValid)
+    .map((result) => result.event!);
 }

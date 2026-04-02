@@ -541,14 +541,12 @@ describe('DynamoDB Utilities', () => {
     });
 
     it('should not retry on conditional check failure', async () => {
-      ddbMock
-        .on(TransactWriteCommand)
-        .rejects(
-          new ConditionalCheckFailedException({
-            message: 'Condition failed',
-            $metadata: {},
-          })
-        );
+      ddbMock.on(TransactWriteCommand).rejects(
+        new ConditionalCheckFailedException({
+          message: 'Condition failed',
+          $metadata: {},
+        })
+      );
 
       await expect(
         transactWrite([

@@ -108,7 +108,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 6. Implement Room State Lambda
+- [x] 6. Implement Room State Lambda
   - [x] 6.1 Create room management functions
     - Write createRoom function to generate unique room code and store in DynamoDB
     - Write getRoomByCode function to query room by code
@@ -147,8 +147,8 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test room discovery filtering by theme
     - Test broadcast to multiple participants
 
-- [ ] 7. Implement WebSocket Connection Handlers
-  - [ ] 7.1 Create connection handler
+- [x] 7. Implement WebSocket Connection Handlers
+  - [x] 7.1 Create connection handler
     - Write handleConnect function to store connection ID in DynamoDB
     - Send current room state on connection
     - _Requirements: 9.1, 9.2_
@@ -157,12 +157,12 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 35: WebSocket connection establishment**
     - **Validates: Requirements 9.1, 9.2**
   
-  - [ ] 7.3 Create disconnect handler
+  - [x] 7.3 Create disconnect handler
     - Write handleDisconnect function to remove connection from DynamoDB
     - Broadcast updated participant list to room
     - _Requirements: 9.5, 9.7_
   
-  - [ ] 7.4 Create message handler with action routing
+  - [x] 7.4 Create message handler with action routing
     - Write handleMessage function to route actions: createRoom, joinRoom, submitPrediction, leaveRoom, heartbeat
     - Implement rate limiting (100 messages/second per connection)
     - _Requirements: 9.8_
@@ -177,15 +177,15 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test message action routing
     - Test rate limiting enforcement
 
-- [ ] 8. Checkpoint - Validate room and connection management
+- [x] 8. Checkpoint - Validate room and connection management
   - Deploy Room State Lambda and WebSocket handlers
   - Test room creation and joining via WebSocket
   - Test event broadcast to multiple connections
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 9. Implement Moment Engine Lambda
-  - [ ] 9.1 Create prediction window generation logic
+- [x] 9. Implement Moment Engine Lambda
+  - [x] 9.1 Create prediction window generation logic
     - Write generatePredictionWindow function triggered by match events (goal, corner, free kick)
     - Implement time-based prediction generation (10-minute intervals)
     - Define prediction types: next_goal_scorer, next_card, next_corner, match_outcome
@@ -196,12 +196,12 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 12: Prediction window structure**
     - **Validates: Requirements 3.1, 3.4**
   
-  - [ ] 9.3 Implement prediction window storage and broadcast
+  - [x] 9.3 Implement prediction window storage and broadcast
     - Store prediction window in DynamoDB with expiration timestamp
     - Broadcast prediction window to all room participants via WebSocket
     - _Requirements: 3.3, 3.4_
   
-  - [ ] 9.4 Create prediction submission handler
+  - [x] 9.4 Create prediction submission handler
     - Write submitPrediction function to record user prediction with timestamp
     - Validate prediction is submitted before window expiration
     - Broadcast submission count without revealing individual predictions
@@ -213,7 +213,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 36: Prediction submission privacy**
     - **Validates: Requirements 3.5, 3.6, 9.4**
   
-  - [ ] 9.6 Implement prediction evaluation
+  - [x] 9.6 Implement prediction evaluation
     - Write evaluatePredictions function to resolve predictions when outcome occurs
     - Close prediction window and determine correct predictions
     - _Requirements: 3.7_
@@ -224,8 +224,8 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test prediction submission validation
     - Test prediction evaluation logic
 
-- [ ] 10. Implement Scoring Lambda
-  - [ ] 10.1 Create points calculation functions
+- [x] 10. Implement Scoring Lambda
+  - [x] 10.1 Create points calculation functions
     - Write calculatePoints function with difficulty-based base points (10/25/50)
     - Write applyStreakMultiplier function: 1.0 + (0.1 × streak), max 2.0
     - Write applyClutchBonus function: 1.5× if submitted in final 10 seconds
@@ -237,7 +237,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 17: Clutch bonus application**
     - **Validates: Requirements 4.1, 4.2, 4.3**
   
-  - [ ] 10.3 Implement leaderboard management
+  - [x] 10.3 Implement leaderboard management
     - Write updateLeaderboard function to recalculate ranks and update DynamoDB
     - Query all scores for room and sort by total points
     - Broadcast updated leaderboard to all room participants
@@ -255,15 +255,15 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test clutch bonus timing calculation
     - Test leaderboard sorting and ranking
 
-- [ ] 11. Checkpoint - Validate prediction and scoring flow
+- [x] 11. Checkpoint - Validate prediction and scoring flow
   - Deploy Moment Engine and Scoring Lambdas
   - Test end-to-end: event → prediction window → submission → evaluation → score update → leaderboard
   - Verify streak and clutch bonuses apply correctly
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 12. Implement Recap Lambda
-  - [ ] 12.1 Create wrapped recap generation
+- [-] 12. Implement Recap Lambda
+  - [x] 12.1 Create wrapped recap generation
     - Write generateWrappedRecap function to calculate user stats: total points, final rank, accuracy, longest streak, clutch moments
     - Store wrapped recap in DynamoDB with shareable URL
     - _Requirements: 5.2, 5.3, 5.5, 5.6_
@@ -274,7 +274,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 24: Recap persistence**
     - **Validates: Requirements 5.2, 5.3, 5.5, 5.6, 5.7**
   
-  - [ ] 12.3 Create room recap generation
+  - [-] 12.3 Create room recap generation
     - Write generateRoomRecap function to aggregate room stats: total participants, top 3 performers, most predicted event, engagement metrics
     - Store room recap in DynamoDB
     - _Requirements: 5.1, 5.4_
@@ -283,7 +283,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 21: Room recap generation**
     - **Validates: Requirements 5.1, 5.4**
   
-  - [ ] 12.5 Implement recap retrieval
+  - [~] 12.5 Implement recap retrieval
     - Write getUserRecaps function to query historical recaps for a user
     - Broadcast recaps to room participants on match conclusion
     - _Requirements: 5.7_
@@ -294,7 +294,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test recap retrieval query
 
 - [ ] 13. Implement authentication and user management
-  - [ ] 13.1 Create guest user generation
+  - [~] 13.1 Create guest user generation
     - Write generateGuestUser function to create temporary user ID and display name
     - Store guest user in DynamoDB with session TTL
     - _Requirements: 7.1, 7.2_
@@ -303,7 +303,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 25: Guest user generation**
     - **Validates: Requirements 7.2**
   
-  - [ ] 13.3 Integrate AWS Cognito for authenticated users
+  - [~] 13.3 Integrate AWS Cognito for authenticated users
     - Configure Cognito user pool and identity pool
     - Implement sign-in flow with JWT validation
     - Link Cognito ID to user entity in DynamoDB
@@ -314,7 +314,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 27: Custom display name setting**
     - **Validates: Requirements 7.4, 7.5**
   
-  - [ ] 13.5 Implement WebSocket reconnection logic
+  - [~] 13.5 Implement WebSocket reconnection logic
     - Add exponential backoff retry mechanism (5 attempts)
     - Restore user session state on reconnection
     - _Requirements: 7.6, 7.7_
@@ -328,7 +328,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test Cognito JWT validation
     - Test reconnection backoff timing
 
-- [ ] 14. Checkpoint - Validate recap generation and authentication
+- [~] 14. Checkpoint - Validate recap generation and authentication
   - Deploy Recap Lambda and authentication integration
   - Test wrapped recap and room recap generation
   - Test guest and authenticated user flows
@@ -338,26 +338,26 @@ The implementation follows an incremental approach: infrastructure setup → bac
 ### Phase 3: Frontend Implementation
 
 - [ ] 15. Set up React PWA project structure
-  - [ ] 15.1 Initialize Vite + React + TypeScript project
+  - [~] 15.1 Initialize Vite + React + TypeScript project
     - Create frontend directory with Vite configuration
     - Install dependencies: React, Zustand, TailwindCSS, react-i18next, fast-check, Vitest
     - Configure TailwindCSS with mobile-first breakpoints
     - _Requirements: 6.1_
   
-  - [ ] 15.2 Configure PWA manifest and service worker
+  - [~] 15.2 Configure PWA manifest and service worker
     - Create web app manifest with app name, icons, theme colors
     - Implement service worker with cache-first strategy for static assets
     - Configure Workbox for offline support
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [ ] 15.3 Set up i18n configuration
+  - [~] 15.3 Set up i18n configuration
     - Configure react-i18next with EN, FR, DE, SW translations
     - Implement locale detection from browser preferences
     - Set up translation files structure
     - _Requirements: 8.1, 8.2_
 
 - [ ] 16. Implement Zustand state management
-  - [ ] 16.1 Create app state store
+  - [~] 16.1 Create app state store
     - Define AppState interface with user, room, match, prediction, leaderboard, connection state
     - Implement state actions: connectWebSocket, createRoom, joinRoom, submitPrediction, setLocale
     - Add middleware for persistence to localStorage
@@ -369,13 +369,13 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test WebSocket message handling
 
 - [ ] 17. Implement WebSocket client integration
-  - [ ] 17.1 Create WebSocket connection manager
+  - [~] 17.1 Create WebSocket connection manager
     - Write connectWebSocket function with automatic reconnection
     - Implement exponential backoff retry logic
     - Handle connection, disconnection, and message events
     - _Requirements: 9.1, 7.7_
   
-  - [ ] 17.2 Implement message handlers for state updates
+  - [~] 17.2 Implement message handlers for state updates
     - Handle match event messages and update matchEvents state
     - Handle prediction window messages and update activePredictionWindow state
     - Handle leaderboard messages and update leaderboard state
@@ -388,7 +388,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test error handling for malformed messages
 
 - [ ] 18. Implement core React components
-  - [ ] 18.1 Create RoomLobby component
+  - [~] 18.1 Create RoomLobby component
     - Implement theme selection UI (Country/Club/Private buttons)
     - Implement room code input and join button
     - Implement public room list with match and theme filters
@@ -399,7 +399,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test room code validation
     - Test room list filtering
   
-  - [ ] 18.3 Create MatchTimeline component
+  - [~] 18.3 Create MatchTimeline component
     - Display match events as cards with icons and timestamps
     - Implement auto-scroll to latest event
     - Localize event descriptions using i18n
@@ -410,7 +410,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test auto-scroll behavior
     - Test localized descriptions
   
-  - [ ] 18.5 Create PredictionWidget component
+  - [~] 18.5 Create PredictionWidget component
     - Display prediction window with countdown timer
     - Render multiple choice options as buttons
     - Implement submit button with loading state
@@ -423,7 +423,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test disabled state after expiration
     - Test result feedback display
   
-  - [ ] 18.7 Create Leaderboard component
+  - [~] 18.7 Create Leaderboard component
     - Display user rank, name, points, streak in table format
     - Highlight current user row
     - Implement smooth rank transition animations
@@ -434,7 +434,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test current user highlighting
     - Test rank sorting
   
-  - [ ] 18.9 Create WrappedRecapView component
+  - [~] 18.9 Create WrappedRecapView component
     - Display personal stats with animations (total points, rank, accuracy, streak, clutch moments)
     - Implement share button for social media
     - Show historical recap access
@@ -445,7 +445,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test share button functionality
     - Test historical recap navigation
 
-- [ ] 19. Checkpoint - Validate frontend core functionality
+- [~] 19. Checkpoint - Validate frontend core functionality
   - Run frontend development server
   - Test room creation and joining UI
   - Test match timeline display
@@ -454,12 +454,12 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 
 - [ ] 20. Implement internationalization (i18n)
-  - [ ] 20.1 Create translation files for all languages
+  - [~] 20.1 Create translation files for all languages
     - Write EN, FR, DE, SW translation files for UI text, labels, messages
     - Translate match event descriptions and prediction prompts
     - _Requirements: 8.1, 8.5_
   
-  - [ ] 20.2 Implement locale detection and switching
+  - [~] 20.2 Implement locale detection and switching
     - Detect browser language preference on app load
     - Implement language selector component
     - Persist language preference to localStorage
@@ -473,7 +473,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 34: Recap localization**
     - **Validates: Requirements 8.2, 8.3, 8.4, 8.5, 8.7**
   
-  - [ ] 20.4 Implement locale-specific formatting
+  - [~] 20.4 Implement locale-specific formatting
     - Format timestamps using locale conventions
     - Format numbers and scores using locale conventions
     - _Requirements: 8.6_
@@ -488,19 +488,19 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test locale persistence
 
 - [ ] 21. Implement PWA offline support
-  - [ ] 21.1 Configure service worker caching strategies
+  - [~] 21.1 Configure service worker caching strategies
     - Implement cache-first for static assets (JS, CSS, images)
     - Implement network-first with cache fallback for API responses
     - Implement network-only for real-time WebSocket data
     - _Requirements: 6.2_
   
-  - [ ] 21.2 Implement offline indicator and state management
+  - [~] 21.2 Implement offline indicator and state management
     - Display offline banner when network connectivity lost
     - Show cached UI with last known state
     - Queue prediction submissions for sync on reconnect
     - _Requirements: 6.4, 6.5_
   
-  - [ ] 21.3 Implement low-bandwidth mode
+  - [~] 21.3 Implement low-bandwidth mode
     - Add toggle for low-bandwidth mode in settings
     - Reduce WebSocket message frequency
     - Transmit only essential match events
@@ -512,24 +512,24 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test online/offline transition
 
 - [ ] 22. Optimize frontend performance
-  - [ ] 22.1 Implement code splitting and lazy loading
+  - [~] 22.1 Implement code splitting and lazy loading
     - Split routes for room lobby, match view, recap view
     - Lazy load heavy components (WrappedRecapView)
     - _Requirements: 6.8_
   
-  - [ ] 22.2 Optimize bundle size and assets
+  - [~] 22.2 Optimize bundle size and assets
     - Minify JavaScript and CSS
     - Compress images and icons
     - Enable gzip/brotli compression
     - _Requirements: 6.8_
   
-  - [ ] 22.3 Run Lighthouse audit and optimize
+  - [~] 22.3 Run Lighthouse audit and optimize
     - Achieve performance score above 80
     - Fix accessibility issues
     - Optimize first contentful paint and time to interactive
     - _Requirements: 6.8_
 
-- [ ] 23. Checkpoint - Validate PWA and i18n features
+- [~] 23. Checkpoint - Validate PWA and i18n features
   - Test PWA installation on mobile device
   - Test offline mode with cached content
   - Test language switching for all supported languages
@@ -540,7 +540,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
 ### Phase 4: Integration and End-to-End Testing
 
 - [ ] 24. Implement complete match event flow
-  - [ ] 24.1 Wire ingestion → EventBridge → room state → WebSocket broadcast
+  - [~] 24.1 Wire ingestion → EventBridge → room state → WebSocket broadcast
     - Verify events flow from XML feed to frontend display
     - Test with all supported event types (goal, card, corner, shot, possession)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
@@ -558,7 +558,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test with simulator mode
 
 - [ ] 25. Implement complete prediction and scoring flow
-  - [ ] 25.1 Wire event → prediction window → submission → evaluation → scoring → leaderboard
+  - [~] 25.1 Wire event → prediction window → submission → evaluation → scoring → leaderboard
     - Verify prediction windows generated on trigger events
     - Test prediction submission and evaluation
     - Test score calculation with streak and clutch bonuses
@@ -572,7 +572,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test clutch bonus timing edge cases
 
 - [ ] 26. Implement complete recap generation flow
-  - [ ] 26.1 Wire match end → recap generation → storage → broadcast → display
+  - [~] 26.1 Wire match end → recap generation → storage → broadcast → display
     - Verify wrapped recap generated for each user
     - Verify room recap generated for room
     - Test shareable link generation
@@ -585,7 +585,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test shareable link functionality
 
 - [ ] 27. Implement multi-user synchronization testing
-  - [ ] 27.1 Test concurrent user interactions
+  - [~] 27.1 Test concurrent user interactions
     - Create room with User A, join with User B
     - Verify both users receive same events simultaneously
     - Verify leaderboard shows both users with correct ranks
@@ -601,7 +601,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test user disconnect and reconnect behavior
     - Test participant list broadcast
 
-- [ ] 28. Checkpoint - Validate end-to-end integration
+- [~] 28. Checkpoint - Validate end-to-end integration
   - Deploy complete system to staging environment
   - Run full integration test suite
   - Test with multiple concurrent users and rooms
@@ -612,19 +612,19 @@ The implementation follows an incremental approach: infrastructure setup → bac
 ### Phase 5: Error Handling and Monitoring
 
 - [ ] 29. Implement comprehensive error handling
-  - [ ] 29.1 Add error handling to all Lambda functions
+  - [~] 29.1 Add error handling to all Lambda functions
     - Implement try-catch blocks with structured logging
     - Add retry logic with exponential backoff for transient errors
     - Configure dead-letter queues for failed events
     - _Requirements: All backend requirements_
   
-  - [ ] 29.2 Add error handling to frontend
+  - [~] 29.2 Add error handling to frontend
     - Implement error boundaries for React components
     - Display user-friendly error messages
     - Log errors to console with context
     - _Requirements: All frontend requirements_
   
-  - [ ] 29.3 Implement graceful degradation
+  - [~] 29.3 Implement graceful degradation
     - Activate simulator mode when event feed unavailable
     - Fall back to guest mode when Cognito fails
     - Display cached content when offline
@@ -636,37 +636,37 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test graceful degradation scenarios
 
 - [ ] 30. Set up monitoring and alerting
-  - [ ] 30.1 Configure CloudWatch Logs and metrics
+  - [~] 30.1 Configure CloudWatch Logs and metrics
     - Enable structured logging for all Lambda functions
     - Create custom metrics for key operations (event processing, prediction submission, score updates)
     - Set up log retention policies
     - _Requirements: All backend requirements_
   
-  - [ ] 30.2 Configure CloudWatch Alarms
+  - [~] 30.2 Configure CloudWatch Alarms
     - Create alarm for DLQ message count > 10 in 5 minutes
     - Create alarm for Lambda error rate > 5%
     - Create alarm for WebSocket connection failure rate > 10%
     - Create alarm for DynamoDB throttled requests > 0
     - _Requirements: All backend requirements_
   
-  - [ ] 30.3 Set up X-Ray tracing
+  - [~] 30.3 Set up X-Ray tracing
     - Enable X-Ray for all Lambda functions
     - Trace event flow through EventBridge
     - Identify slow DynamoDB queries
     - _Requirements: All backend requirements_
 
 - [ ] 31. Implement DynamoDB TTL cleanup
-  - [ ] 31.1 Configure TTL attribute on room entities
+  - [~] 31.1 Configure TTL attribute on room entities
     - Set TTL to 7 days after match completion
     - Verify automatic deletion of expired rooms
     - _Requirements: 10.9_
   
-  - [ ] 31.2 Configure TTL for guest user sessions
+  - [~] 31.2 Configure TTL for guest user sessions
     - Set TTL to 24 hours after last activity
     - Verify automatic cleanup of inactive guest users
     - _Requirements: 7.2_
 
-- [ ] 32. Checkpoint - Validate error handling and monitoring
+- [~] 32. Checkpoint - Validate error handling and monitoring
   - Test error scenarios (malformed XML, DynamoDB throttling, WebSocket failures)
   - Verify CloudWatch alarms trigger correctly
   - Review X-Ray traces for performance bottlenecks
@@ -676,13 +676,13 @@ The implementation follows an incremental approach: infrastructure setup → bac
 ### Phase 6: Deployment and Demo Preparation
 
 - [ ] 33. Set up CI/CD pipeline
-  - [ ] 33.1 Configure GitHub Actions workflow
+  - [~] 33.1 Configure GitHub Actions workflow
     - Create workflow for running unit tests on every PR
     - Create workflow for running property tests on every PR (100 iterations)
     - Create workflow for running integration tests on merge to main
     - _Requirements: All_
   
-  - [ ] 33.2 Configure automated deployment
+  - [~] 33.2 Configure automated deployment
     - Deploy backend to AWS on merge to main
     - Deploy frontend to S3 + CloudFront on merge to main
     - Run smoke tests against staging environment
@@ -690,21 +690,21 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - _Requirements: All_
 
 - [ ] 34. Deploy to production environment
-  - [ ] 34.1 Deploy backend infrastructure
+  - [~] 34.1 Deploy backend infrastructure
     - Deploy DynamoDB table with GSI
     - Deploy EventBridge event bus and rules
     - Deploy API Gateway WebSocket API
     - Deploy all 6 Lambda functions
     - _Requirements: All backend requirements_
   
-  - [ ] 34.2 Deploy frontend to S3 + CloudFront
+  - [~] 34.2 Deploy frontend to S3 + CloudFront
     - Build optimized production bundle
     - Upload static assets to S3
     - Configure CloudFront distribution with edge caching
     - Set up custom domain and SSL certificate
     - _Requirements: All frontend requirements_
   
-  - [ ] 34.3 Configure production environment variables
+  - [~] 34.3 Configure production environment variables
     - Set API Gateway WebSocket endpoint URL
     - Set DynamoDB table name
     - Set EventBridge event bus name
@@ -712,13 +712,13 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - _Requirements: All_
 
 - [ ] 35. Prepare hackathon demo
-  - [ ] 35.1 Create demo script and test data
+  - [~] 35.1 Create demo script and test data
     - Prepare recorded match events for simulator mode
     - Create demo room codes for quick access
     - Prepare demo user accounts (guest and authenticated)
     - _Requirements: 2.7, 13.8_
   
-  - [ ] 35.2 Test complete demo flow
+  - [~] 35.2 Test complete demo flow
     - Test room creation and joining with 2+ users
     - Test real-time event integration with 3+ event types (goal, card, corner)
     - Test complete gamification loop: prediction → submission → evaluation → score → leaderboard
@@ -726,7 +726,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test simulator mode fallback
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8_
   
-  - [ ] 35.3 Verify all evaluation criteria
+  - [~] 35.3 Verify all evaluation criteria
     - Confirm 2+ concurrent users supported
     - Confirm 3+ match event types integrated
     - Confirm complete gamification loop demonstrated
@@ -734,7 +734,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Confirm simulator mode works seamlessly
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8_
 
-- [ ] 36. Final checkpoint - Production readiness validation
+- [~] 36. Final checkpoint - Production readiness validation
   - Run complete test suite (unit, property, integration)
   - Verify all 48 correctness properties pass
   - Test production deployment with real users

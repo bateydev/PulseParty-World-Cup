@@ -31,7 +31,8 @@ describe('WebSocket Connection Handler', () => {
     jest.clearAllMocks();
     // Set environment variables before importing the handler
     process.env.TABLE_NAME = 'TestTable';
-    process.env.WEBSOCKET_API_ENDPOINT = 'wss://test.execute-api.us-east-1.amazonaws.com/prod';
+    process.env.WEBSOCKET_API_ENDPOINT =
+      'wss://test.execute-api.us-east-1.amazonaws.com/prod';
   });
 
   const createMockEvent = (
@@ -362,9 +363,8 @@ describe('WebSocket Connection Handler', () => {
       mockQueryItems.mockResolvedValue([]);
 
       // Mock WebSocket send to fail
-      const { ApiGatewayManagementApiClient } = await import(
-        '@aws-sdk/client-apigatewaymanagementapi'
-      );
+      const { ApiGatewayManagementApiClient } =
+        await import('@aws-sdk/client-apigatewaymanagementapi');
       (ApiGatewayManagementApiClient as jest.Mock).mockImplementation(() => ({
         send: jest.fn().mockRejectedValue(new Error('WebSocket error')),
       }));

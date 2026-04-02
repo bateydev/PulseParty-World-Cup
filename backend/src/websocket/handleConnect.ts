@@ -69,8 +69,7 @@ export async function handler(
 
   try {
     // Extract query parameters
-    const userId =
-      event.queryStringParameters?.userId || `guest-${Date.now()}`;
+    const userId = event.queryStringParameters?.userId || `guest-${Date.now()}`;
     const roomId = event.queryStringParameters?.roomId;
 
     // Store connection entity in DynamoDB
@@ -126,9 +125,7 @@ export async function handler(
 /**
  * Get current room state including active users, current score, and leaderboard
  */
-async function getCurrentRoomState(
-  roomId: string
-): Promise<RoomState | null> {
+async function getCurrentRoomState(roomId: string): Promise<RoomState | null> {
   try {
     // Get room entity
     const room = await getItem<RoomEntity>({

@@ -5,7 +5,8 @@
   "private": true,
   "workspaces": [
     "backend",
-    "frontend"
+    "frontend",
+    "infrastructure"
   ],
   "scripts": {
     "install:all": "npm install && npm install --workspace=backend && npm install --workspace=frontend",

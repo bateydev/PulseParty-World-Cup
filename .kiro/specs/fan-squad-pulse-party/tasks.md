@@ -10,7 +10,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 ### Phase 1: Infrastructure and Project Setup
 
-- [ ] 1. Initialize project structure and dependencies
+- [x] 1. Initialize project structure and dependencies
   - Create monorepo structure with `backend/` and `frontend/` directories
   - Initialize TypeScript configuration for both backend and frontend
   - Set up package.json with dependencies: AWS SDK, fast-check, Jest, Vitest, React, Zustand, TailwindCSS
@@ -18,12 +18,12 @@ The implementation follows an incremental approach: infrastructure setup → bac
   - _Requirements: All_
 
 - [ ] 2. Set up AWS infrastructure with CDK or SAM
-  - [ ] 2.1 Define DynamoDB single-table with GSI for match+theme discovery
+  - [x] 2.1 Define DynamoDB single-table with GSI for match+theme discovery
     - Create table with PK, SK, GSI1PK, GSI1SK, and TTL attribute
     - Configure on-demand billing mode
     - _Requirements: 10.1, 10.2, 10.9_
   
-  - [ ] 2.2 Define EventBridge event bus and routing rules
+  - [-] 2.2 Define EventBridge event bus and routing rules
     - Create custom event bus for match events
     - Define routing rules by match ID to target Lambda functions
     - Configure dead-letter queue for failed events

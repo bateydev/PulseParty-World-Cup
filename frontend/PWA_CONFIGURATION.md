@@ -286,4 +286,127 @@ npm run preview
 
 ### Bundle Size
 
-Monitor bu
+Monitor bundle size:
+```bash
+npm run build
+# Check dist/ folder size
+```
+
+**Optimization techniques:**
+- Tree shaking (automatic with Vite)
+- Dynamic imports for routes
+- Lazy loading heavy components
+- Remove unused dependencies
+
+## Troubleshooting
+
+### Service Worker Not Updating
+
+**Solution:**
+1. Open DevTools → Application → Service Workers
+2. Check "Update on reload"
+3. Click "Unregister" and reload
+4. Or use `clearAllCaches()` function
+
+### Icons Not Displaying
+
+**Solution:**
+1. Ensure PNG icons exist in `public/` directory
+2. Generate from SVG: `convert -background none public/pwa-icon.svg -resize 192x192 public/pwa-192x192.png`
+3. Clear browser cache and reload
+
+### Offline Mode Not Working
+
+**Solution:**
+1. Check service worker is registered: DevTools → Application → Service Workers
+2. Verify cache storage: DevTools → Application → Cache Storage
+3. Ensure HTTPS (service workers require secure context)
+4. Check console for errors
+
+### Update Not Showing
+
+**Solution:**
+1. Service worker updates check every 60 seconds
+2. Force update: DevTools → Application → Service Workers → "Update"
+3. Or reload page (with "Update on reload" checked)
+
+## Production Deployment
+
+### Pre-deployment Checklist
+
+- [ ] Generate production icons from SVG
+- [ ] Update manifest with production domain
+- [ ] Test offline mode thoroughly
+- [ ] Run Lighthouse audit (score >80)
+- [ ] Test installation on iOS and Android
+- [ ] Verify service worker registration
+- [ ] Test update flow
+- [ ] Configure HTTPS (required for PWA)
+
+### Build Command
+
+```bash
+cd frontend
+npm run build
+```
+
+Output: `dist/` directory with:
+- Optimized JS/CSS bundles
+- Service worker (`sw.js`)
+- Web app manifest
+- Static assets
+
+### Deployment
+
+Deploy `dist/` directory to:
+- **S3 + CloudFront** (recommended for AWS)
+- **Netlify** (automatic PWA support)
+- **Vercel** (automatic PWA support)
+- Any static hosting with HTTPS
+
+**Important:** Ensure HTTPS is configured - PWAs require secure context.
+
+## Monitoring
+
+### Service Worker Metrics
+
+Track in production:
+- Service worker registration success rate
+- Cache hit/miss ratio
+- Offline usage patterns
+- Update adoption rate
+
+### User Experience Metrics
+
+Monitor:
+- Time to interactive (TTI)
+- First contentful paint (FCP)
+- Largest contentful paint (LCP)
+- Cumulative layout shift (CLS)
+
+Use tools:
+- Google Analytics
+- Sentry (error tracking)
+- CloudWatch (if using AWS)
+
+## Future Enhancements
+
+### Potential Improvements
+
+1. **Background Sync:** Queue predictions when offline, sync when online
+2. **Push Notifications:** Notify users of match events and predictions
+3. **Periodic Background Sync:** Update match data in background
+4. **Share Target API:** Allow sharing to PulseParty from other apps
+5. **Install Prompt:** Custom install prompt with better UX
+
+### Implementation Notes
+
+These features require additional service worker capabilities and may need user permissions.
+
+## References
+
+- [MDN: Progressive Web Apps](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+- [Vite PWA Plugin](https://vite-pwa-org.netlify.app/)
+- [Workbox Documentation](https://developer.chrome.com/docs/workbox/)
+- [Web App Manifest](https://developer.mozilla.org/en-US/docs/Web/Manifest)
+- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)

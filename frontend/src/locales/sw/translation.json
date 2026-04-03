@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "PulseParty Rooms",
+    "tagline": "Uzoefu wa mchezo wa moja kwa moja na marafiki"
+  },
+  "common": {
+    "welcome": "Karibu PulseParty Rooms",
+    "loading": "Inapakia...",
+    "error": "Hitilafu imetokea",
+    "retry": "Jaribu tena",
+    "cancel": "Ghairi",
+    "confirm": "Thibitisha",
+    "close": "Funga",
+    "save": "Hifadhi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "share": "Shiriki",
+    "back": "Rudi",
+    "next": "Ifuatayo",
+    "submit": "Wasilisha",
+    "offline": "Uko nje ya mtandao. Inaunganisha tena...",
+    "online": "Umerudi mtandaoni!",
+    "demo_mode": "Hali ya onyesho: Kutumia data ya mchezo wa majaribio"
+  },
+  "room": {
+    "create": "Unda Chumba",
+    "join": "Jiunge na Chumba",
+    "code": "Msimbo wa Chumba",
+    "code_placeholder": "Weka msimbo wa chumba",
+    "theme": "Mandhari ya Chumba",
+    "theme_country": "Nchi",
+    "theme_club": "Klabu",
+    "theme_private": "Binafsi",
+    "discover": "Gundua Vyumba",
+    "participants": "Washiriki",
+    "not_found": "Chumba hakijapatikana. Angalia msimbo na ujaribu tena.",
+    "created": "Chumba kimeundwa kwa mafanikio!",
+    "joined": "Umejiunga na chumba"
+  },
+  "match": {
+    "timeline": "Ratiba ya Mchezo",
+    "score": "Alama",
+    "live": "Moja kwa moja",
+    "finished": "Imekamilika",
+    "half_time": "Nusu Muda",
+    "full_time": "Muda Kamili"
+  },
+  "events": {
+    "goal": "Goli",
+    "assist": "Msaada",
+    "yellow_card": "Kadi ya Njano",
+    "red_card": "Kadi Nyekundu",
+    "substitution": "Ubadilishaji",
+    "corner": "Kona",
+    "shot": "Kombe",
+    "possession": "Sasisho la Umiliki",
+    "goal_description": "{{player}} amefunga goli kwa {{team}}!",
+    "assist_description": "{{player}} amesaidia",
+    "yellow_card_description": "{{player}} amepokea kadi ya njano",
+    "red_card_description": "{{player}} amepokea kadi nyekundu",
+    "substitution_description": "{{playerOut}} amebadilishwa na {{playerIn}}",
+    "corner_description": "Kona kwa {{team}}",
+    "shot_description": "Kombe na {{player}}",
+    "possession_description": "{{team}} ana {{percentage}}% ya umiliki"
+  },
+  "prediction": {
+    "title": "Fanya Utabiri Wako",
+    "submit": "Wasilisha Utabiri",
+    "submitted": "Utabiri umewasilishwa!",
+    "time_up": "Muda umeisha! Subiri utabiri unaofuata.",
+    "expired": "Dirisha hili la utabiri limeisha muda",
+    "correct": "Sahihi! +{{points}} pointi",
+    "incorrect": "Si sahihi. Bahati nzuri wakati ujao!",
+    "next_goal_scorer": "Nani atafunga goli lijalo?",
+    "next_card": "Kadi ijayo?",
+    "next_corner": "Kona ijayo?",
+    "match_outcome": "Matokeo ya mchezo?",
+    "countdown": "{{seconds}}s zimesalia"
+  },
+  "leaderboard": {
+    "title": "Jedwali la Viongozi",
+    "rank": "Nafasi",
+    "player": "Mchezaji",
+    "points": "Pointi",
+    "streak": "Mfululizo",
+    "you": "Wewe",
+    "accuracy": "Usahihi"
+  },
+  "recap": {
+    "title": "Muhtasari wa Mchezo",
+    "wrapped_title": "Muhtasari Wako",
+    "room_title": "Muhtasari wa Chumba",
+    "total_points": "Jumla ya Pointi",
+    "final_rank": "Nafasi ya Mwisho",
+    "accuracy": "Usahihi",
+    "longest_streak": "Mfululizo Mrefu Zaidi",
+    "clutch_moments": "Nyakati Muhimu",
+    "total_participants": "Jumla ya Washiriki",
+    "top_performers": "Wanamichezo Bora",
+    "most_predicted": "Tukio Lililoaguliwa Zaidi",
+    "share_title": "Shiriki Muhtasari Wako",
+    "view_history": "Tazama Historia"
+  },
+  "auth": {
+    "guest": "Endelea kama Mgeni",
+    "sign_in": "Ingia",
+    "sign_out": "Toka",
+    "display_name": "Jina la Kuonyesha",
+    "display_name_placeholder": "Weka jina lako",
+    "sign_in_failed": "Kuingia kumeshindwa. Kuendelea kama mgeni."
+  },
+  "settings": {
+    "title": "Mipangilio",
+    "language": "Lugha",
+    "low_bandwidth": "Hali ya Bandwidth ya Chini",
+    "low_bandwidth_description": "Punguza matumizi ya data"
+  }
+}

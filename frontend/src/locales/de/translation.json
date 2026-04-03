@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "PulseParty Rooms",
+    "tagline": "Live-Match-Erlebnis mit Freunden"
+  },
+  "common": {
+    "welcome": "Willkommen bei PulseParty Rooms",
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Erneut versuchen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "close": "Schließen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "share": "Teilen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "submit": "Absenden",
+    "offline": "Sie sind offline. Verbindung wird wiederhergestellt...",
+    "online": "Wieder online!",
+    "demo_mode": "Demo-Modus: Verwendung simulierter Spieldaten"
+  },
+  "room": {
+    "create": "Raum erstellen",
+    "join": "Raum beitreten",
+    "code": "Raumcode",
+    "code_placeholder": "Raumcode eingeben",
+    "theme": "Raumthema",
+    "theme_country": "Land",
+    "theme_club": "Verein",
+    "theme_private": "Privat",
+    "discover": "Räume entdecken",
+    "participants": "Teilnehmer",
+    "not_found": "Raum nicht gefunden. Überprüfen Sie den Code und versuchen Sie es erneut.",
+    "created": "Raum erfolgreich erstellt!",
+    "joined": "Sie sind dem Raum beigetreten"
+  },
+  "match": {
+    "timeline": "Spielverlauf",
+    "score": "Spielstand",
+    "live": "Live",
+    "finished": "Beendet",
+    "half_time": "Halbzeit",
+    "full_time": "Abpfiff"
+  },
+  "events": {
+    "goal": "Tor",
+    "assist": "Vorlage",
+    "yellow_card": "Gelbe Karte",
+    "red_card": "Rote Karte",
+    "substitution": "Auswechslung",
+    "corner": "Ecke",
+    "shot": "Schuss",
+    "possession": "Ballbesitz-Update",
+    "goal_description": "{{player}} hat für {{team}} getroffen!",
+    "assist_description": "{{player}} hat vorgelegt",
+    "yellow_card_description": "{{player}} hat eine gelbe Karte erhalten",
+    "red_card_description": "{{player}} hat eine rote Karte erhalten",
+    "substitution_description": "{{playerOut}} wurde durch {{playerIn}} ersetzt",
+    "corner_description": "Ecke für {{team}}",
+    "shot_description": "Schuss von {{player}}",
+    "possession_description": "{{team}} hat {{percentage}}% Ballbesitz"
+  },
+  "prediction": {
+    "title": "Machen Sie Ihre Vorhersage",
+    "submit": "Vorhersage absenden",
+    "submitted": "Vorhersage abgesendet!",
+    "time_up": "Zeit abgelaufen! Warten Sie auf die nächste Vorhersage.",
+    "expired": "Dieses Vorhersagefenster ist abgelaufen",
+    "correct": "Richtig! +{{points}} Punkte",
+    "incorrect": "Falsch. Viel Glück beim nächsten Mal!",
+    "next_goal_scorer": "Wer wird als nächstes treffen?",
+    "next_card": "Nächste Karte?",
+    "next_corner": "Nächste Ecke?",
+    "match_outcome": "Spielausgang?",
+    "countdown": "{{seconds}}s verbleibend"
+  },
+  "leaderboard": {
+    "title": "Bestenliste",
+    "rank": "Rang",
+    "player": "Spieler",
+    "points": "Punkte",
+    "streak": "Serie",
+    "you": "Sie",
+    "accuracy": "Genauigkeit"
+  },
+  "recap": {
+    "title": "Spielzusammenfassung",
+    "wrapped_title": "Ihre Zusammenfassung",
+    "room_title": "Raumzusammenfassung",
+    "total_points": "Gesamtpunkte",
+    "final_rank": "Endrang",
+    "accuracy": "Genauigkeit",
+    "longest_streak": "Längste Serie",
+    "clutch_moments": "Entscheidende Momente",
+    "total_participants": "Gesamtteilnehmer",
+    "top_performers": "Top-Performer",
+    "most_predicted": "Am häufigsten vorhergesagtes Ereignis",
+    "share_title": "Teilen Sie Ihre Zusammenfassung",
+    "view_history": "Verlauf anzeigen"
+  },
+  "auth": {
+    "guest": "Als Gast fortfahren",
+    "sign_in": "Anmelden",
+    "sign_out": "Abmelden",
+    "display_name": "Anzeigename",
+    "display_name_placeholder": "Geben Sie Ihren Namen ein",
+    "sign_in_failed": "Anmeldung fehlgeschlagen. Als Gast fortfahren."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "low_bandwidth": "Niedriger Bandbreitenmodus",
+    "low_bandwidth_description": "Datenverbrauch reduzieren"
+  }
+}

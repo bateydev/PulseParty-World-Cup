@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "PulseParty Rooms",
+    "tagline": "Live match experience with friends"
+  },
+  "common": {
+    "welcome": "Welcome to PulseParty Rooms",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "share": "Share",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "offline": "You're offline. Reconnecting...",
+    "online": "Back online!",
+    "demo_mode": "Demo mode: Using simulated match data"
+  },
+  "room": {
+    "create": "Create Room",
+    "join": "Join Room",
+    "code": "Room Code",
+    "code_placeholder": "Enter room code",
+    "theme": "Room Theme",
+    "theme_country": "Country",
+    "theme_club": "Club",
+    "theme_private": "Private",
+    "discover": "Discover Rooms",
+    "participants": "Participants",
+    "not_found": "Room not found. Check the code and try again.",
+    "created": "Room created successfully!",
+    "joined": "You joined the room"
+  },
+  "match": {
+    "timeline": "Match Timeline",
+    "score": "Score",
+    "live": "Live",
+    "finished": "Finished",
+    "half_time": "Half Time",
+    "full_time": "Full Time"
+  },
+  "events": {
+    "goal": "Goal",
+    "assist": "Assist",
+    "yellow_card": "Yellow Card",
+    "red_card": "Red Card",
+    "substitution": "Substitution",
+    "corner": "Corner",
+    "shot": "Shot",
+    "possession": "Possession Update",
+    "goal_description": "{{player}} scored for {{team}}!",
+    "assist_description": "{{player}} assisted",
+    "yellow_card_description": "{{player}} received a yellow card",
+    "red_card_description": "{{player}} received a red card",
+    "substitution_description": "{{playerOut}} substituted by {{playerIn}}",
+    "corner_description": "Corner for {{team}}",
+    "shot_description": "Shot by {{player}}",
+    "possession_description": "{{team}} has {{percentage}}% possession"
+  },
+  "prediction": {
+    "title": "Make Your Prediction",
+    "submit": "Submit Prediction",
+    "submitted": "Prediction submitted!",
+    "time_up": "Time's up! Wait for the next prediction.",
+    "expired": "This prediction window has expired",
+    "correct": "Correct! +{{points}} points",
+    "incorrect": "Incorrect. Better luck next time!",
+    "next_goal_scorer": "Who will score next?",
+    "next_card": "Next card?",
+    "next_corner": "Next corner?",
+    "match_outcome": "Match outcome?",
+    "countdown": "{{seconds}}s remaining"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "player": "Player",
+    "points": "Points",
+    "streak": "Streak",
+    "you": "You",
+    "accuracy": "Accuracy"
+  },
+  "recap": {
+    "title": "Match Recap",
+    "wrapped_title": "Your Wrapped Recap",
+    "room_title": "Room Recap",
+    "total_points": "Total Points",
+    "final_rank": "Final Rank",
+    "accuracy": "Accuracy",
+    "longest_streak": "Longest Streak",
+    "clutch_moments": "Clutch Moments",
+    "total_participants": "Total Participants",
+    "top_performers": "Top Performers",
+    "most_predicted": "Most Predicted Event",
+    "share_title": "Share Your Recap",
+    "view_history": "View History"
+  },
+  "auth": {
+    "guest": "Continue as Guest",
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out",
+    "display_name": "Display Name",
+    "display_name_placeholder": "Enter your name",
+    "sign_in_failed": "Sign-in failed. Continuing as guest."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "low_bandwidth": "Low Bandwidth Mode",
+    "low_bandwidth_description": "Reduce data usage"
+  }
+}

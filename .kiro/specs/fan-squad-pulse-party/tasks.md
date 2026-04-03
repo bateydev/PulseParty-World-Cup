@@ -337,27 +337,27 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 ### Phase 3: Frontend Implementation
 
-- [-] 15. Set up React PWA project structure
+- [x] 15. Set up React PWA project structure
   - [x] 15.1 Initialize Vite + React + TypeScript project
     - Create frontend directory with Vite configuration
     - Install dependencies: React, Zustand, TailwindCSS, react-i18next, fast-check, Vitest
     - Configure TailwindCSS with mobile-first breakpoints
     - _Requirements: 6.1_
   
-  - [-] 15.2 Configure PWA manifest and service worker
+  - [x] 15.2 Configure PWA manifest and service worker
     - Create web app manifest with app name, icons, theme colors
     - Implement service worker with cache-first strategy for static assets
     - Configure Workbox for offline support
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [~] 15.3 Set up i18n configuration
+  - [x] 15.3 Set up i18n configuration
     - Configure react-i18next with EN, FR, DE, SW translations
     - Implement locale detection from browser preferences
     - Set up translation files structure
     - _Requirements: 8.1, 8.2_
 
-- [ ] 16. Implement Zustand state management
-  - [~] 16.1 Create app state store
+- [-] 16. Implement Zustand state management
+  - [-] 16.1 Create app state store
     - Define AppState interface with user, room, match, prediction, leaderboard, connection state
     - Implement state actions: connectWebSocket, createRoom, joinRoom, submitPrediction, setLocale
     - Add middleware for persistence to localStorage

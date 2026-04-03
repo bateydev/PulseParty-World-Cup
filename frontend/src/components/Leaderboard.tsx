@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
+import { formatPoints, formatRank } from '../utils/formatters';
 
 /**
  * Leaderboard Component
@@ -16,8 +17,9 @@ import { useAppStore } from '../store';
  */
 
 export function Leaderboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { leaderboard, user } = useAppStore();
+  const locale = i18n.language;
 
   // Get streak display with fire emoji
   const getStreakDisplay = (streak: number): string => {
@@ -130,7 +132,7 @@ export function Leaderboard() {
                       <p className={`font-bold text-yellow-600 dark:text-yellow-400 ${
                         actualRank === 1 ? 'text-2xl' : 'text-lg'
                       }`}>
-                        {player.totalPoints}
+                        {formatPoints(player.totalPoints, locale)}
                       </p>
                     </div>
                   );
@@ -189,7 +191,7 @@ export function Leaderboard() {
                       {/* Rank & Avatar */}
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="text-lg font-bold text-gray-600 dark:text-gray-400 w-8">
-                          {entry.rank}
+                          {formatRank(entry.rank, locale)}
                         </div>
                         <div
                           className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(
@@ -216,7 +218,7 @@ export function Leaderboard() {
                       {/* Points */}
                       <div className="text-right">
                         <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                          {entry.totalPoints}
+                          {formatPoints(entry.totalPoints, locale)}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">points</p>
                       </div>

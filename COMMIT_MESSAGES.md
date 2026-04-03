@@ -436,3 +436,115 @@ I recommend **Option 2** (Multiple Commits) as it:
 - Groups related changes together
 
 Each commit is self-contained and represents a complete feature or improvement.
+
+
+## Task 20.4: Locale-Specific Formatting
+
+### Files Changed:
+- `frontend/src/components/Leaderboard.tsx`
+- `frontend/src/components/MatchTimeline.tsx`
+- `frontend/src/components/PredictionWidget.tsx`
+- `frontend/src/components/LivePitch.tsx`
+
+### Description:
+Implemented locale-specific formatting for all numbers, dates, times, percentages, and scores across the frontend components. This ensures that users see data formatted according to their selected language (EN, FR, DE, SW).
+
+**Changes:**
+- Leaderboard: Added `formatPoints()` for point values and `formatRank()` for rank display (1st, 2nd, 3rd, etc.)
+- MatchTimeline: Replaced manual time formatting with `formatTime()` utility
+- PredictionWidget: Added `formatNumber()` for countdown timer display
+- LivePitch: Added `formatScore()` and `formatPercentage()` for match statistics
+
+All components now use the `i18n.language` from the translation hook to determine the user's locale and format data accordingly.
+
+
+## Task 21: PWA Offline Support and Low-Bandwidth Mode
+
+### Files Changed:
+- `frontend/src/hooks/useLowBandwidth.ts` (new)
+- `frontend/src/components/LowBandwidthIndicator.tsx` (new)
+- `frontend/src/components/SettingsPanel.tsx` (new)
+- `frontend/src/App.tsx`
+
+### Description:
+Completed PWA offline support implementation with low-bandwidth mode feature. The app now provides comprehensive offline capabilities and bandwidth optimization.
+
+**Task 21.1 - Service Worker Caching** (Already configured):
+- Cache-first strategy for static assets (images, fonts) with 30-day expiration
+- Network-first strategy for API calls with 5-minute cache fallback
+- Network-only for WebSocket real-time data
+- Configured in `vite.config.ts` using vite-plugin-pwa
+
+**Task 21.2 - Offline Indicator** (Already implemented):
+- Yellow banner displays when network is lost
+- Green banner shows when connection is restored
+- PWA status component tracks online/offline state
+- Implemented in `PWAStatus.tsx` and `pwa-registration.ts`
+
+**Task 21.3 - Low-Bandwidth Mode** (New):
+- Created `useLowBandwidth` hook with automatic slow connection detection
+- Detects 2G/slow-2G connections and data saver mode
+- Manual toggle in settings panel
+- Persists preference to localStorage
+- Visual indicator when active (orange banner)
+- Settings panel with comprehensive app preferences
+
+**Features:**
+- Automatic detection using Network Information API
+- Manual toggle with persistence
+- Visual feedback with orange indicator banner
+- Settings panel for all app preferences (dark mode, language, bandwidth)
+- Integrates with existing PWA infrastructure
+
+All PWA requirements (6.1-6.7) are now fully implemented.
+
+
+## Task 24.1: Backend Integration - WebSocket Connection Setup
+
+### Files Changed:
+- `frontend/src/config/environment.ts` (new)
+- `frontend/.env.example` (new)
+- `frontend/BACKEND_INTEGRATION_GUIDE.md` (new)
+
+### Description:
+Completed the frontend-backend integration setup with comprehensive WebSocket connection configuration and documentation.
+
+**Environment Configuration:**
+- Created centralized environment config with development/production support
+- WebSocket URL configuration via environment variables
+- Automatic environment detection (DEV/PROD)
+- Debug logging toggle for development
+
+**Environment Variables:**
+- `.env.example` template with all required variables
+- WebSocket URL configuration (ws:// for dev, wss:// for prod)
+- REST API URL configuration
+- AWS Cognito configuration placeholders
+
+**Integration Documentation:**
+- Comprehensive 400+ line integration guide
+- Complete WebSocket message protocol documentation
+- Client → Server message formats (createRoom, joinRoom, submitPrediction, etc.)
+- Server → Client message formats (roomCreated, matchEvent, predictionWindow, etc.)
+- Connection flow examples with code snippets
+- Error handling patterns
+- Testing strategies (manual and automated)
+- Troubleshooting guide
+- Security considerations (authentication, rate limiting, validation)
+- Monitoring and logging recommendations
+
+**Infrastructure Already in Place:**
+- WebSocket connection manager with exponential backoff (Tasks 17.1, 17.2)
+- Zustand store with WebSocket actions (Task 16.1)
+- Message routing and state management
+- Reconnection logic (5 attempts with backoff: 1s, 2s, 4s, 8s, 16s)
+
+**Ready for Backend Connection:**
+- Frontend can connect to WebSocket API Gateway
+- All message types are handled in the store
+- Room creation/joining flows are implemented
+- Prediction submission is ready
+- Leaderboard updates are wired
+- Match events are processed
+
+Next step: Deploy backend infrastructure and test end-to-end integration.

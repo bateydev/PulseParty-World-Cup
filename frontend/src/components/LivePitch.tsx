@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
+import { formatScore, formatPercentage } from '../utils/formatters';
 
 interface BallPosition {
   x: number; // 0-100 (percentage from left)
@@ -16,7 +18,9 @@ interface Player {
 }
 
 export function LivePitch() {
+  const { i18n } = useTranslation();
   const { matchEvents, currentScore } = useAppStore();
+  const locale = i18n.language;
   const [ballPosition, setBallPosition] = useState<BallPosition>({ x: 50, y: 50, timestamp: Date.now() });
   const [possession, setPossession] = useState<'home' | 'away' | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -251,15 +255,15 @@ export function LivePitch() {
       <div className="grid grid-cols-3 gap-2 mt-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-3 text-center border border-gray-200 dark:border-gray-700">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Shots</div>
-          <div className="text-lg font-bold text-gray-900 dark:text-white">8 - 6</div>
+          <div className="text-lg font-bold text-gray-900 dark:text-white">{formatScore(8, 6, locale)}</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl p-3 text-center border border-gray-200 dark:border-gray-700">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Possession</div>
-          <div className="text-lg font-bold text-gray-900 dark:text-white">52% - 48%</div>
+          <div className="text-lg font-bold text-gray-900 dark:text-white">{formatPercentage(52, locale, 0)} - {formatPercentage(48, locale, 0)}</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl p-3 text-center border border-gray-200 dark:border-gray-700">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Corners</div>
-          <div className="text-lg font-bold text-gray-900 dark:text-white">4 - 3</div>
+          <div className="text-lg font-bold text-gray-900 dark:text-white">{formatScore(4, 3, locale)}</div>
         </div>
       </div>
     </div>

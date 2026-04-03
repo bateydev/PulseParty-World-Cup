@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
+import { formatNumber } from '../utils/formatters';
 
 /**
  * PredictionWidget Component
@@ -15,8 +16,9 @@ import { useAppStore } from '../store';
  */
 
 export function PredictionWidget() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activePredictionWindow, submitPrediction, wsConnected, addMatchEvent } = useAppStore();
+  const locale = i18n.language;
 
   // Local state
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
@@ -155,7 +157,7 @@ export function PredictionWidget() {
 
   // Format countdown display
   const formatCountdown = (seconds: number): string => {
-    return t('prediction.countdown', { seconds });
+    return t('prediction.countdown', { seconds: formatNumber(seconds, locale) });
   };
 
   // Get countdown color based on remaining time

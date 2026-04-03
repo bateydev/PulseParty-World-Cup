@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
+import { formatTime } from '../utils/formatters';
 
 /**
  * MatchTimeline Component
@@ -42,9 +43,10 @@ const EVENT_COLORS: Record<string, string> = {
 };
 
 export function MatchTimeline() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { matchEvents } = useAppStore();
   const timelineEndRef = useRef<HTMLDivElement>(null);
+  const locale = i18n.language;
 
   // Auto-scroll to latest event
   useEffect(() => {
@@ -58,12 +60,7 @@ export function MatchTimeline() {
 
   // Format timestamp to display time
   const formatTimestamp = (timestamp: string): string => {
-    try {
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return timestamp;
-    }
+    return formatTime(timestamp, locale);
   };
 
   // Get localized event description

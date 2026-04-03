@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
 import { Toast } from './Toast';
+import { formatPercentage, formatPoints, formatDateTime } from '../utils/formatters';
 
 /**
  * WrappedRecapView Component
@@ -34,11 +35,14 @@ interface WrappedRecapViewProps {
 }
 
 export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAppStore();
   const [animationPhase, setAnimationPhase] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  // Get current locale
+  const locale = i18n.language;
 
   // Animate stats reveal
   useEffect(() => {
@@ -64,9 +68,9 @@ export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
     if (!recap) return;
 
     const shareText = t('recap.shareText', {
-      points: recap.totalPoints,
+      points: formatPoints(recap.totalPoints, locale),
       rank: recap.finalRank,
-      accuracy: recap.accuracy.toFixed(1),
+      accuracy: formatPercentage(recap.accuracy, locale, 1),
     });
 
     const shareUrl = recap.shareableUrl || window.location.href;
@@ -179,7 +183,7 @@ export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
               💎
             </div>
             <div className="text-3xl font-black text-blue-600 dark:text-blue-400">
-              {recap.totalPoints}
+              {formatPoints(recap.totalPoints, locale)}
             </div>
           </div>
           <div className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
@@ -221,7 +225,7 @@ export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
               🎯
             </div>
             <div className="text-3xl font-black text-green-600 dark:text-green-400">
-              {recap.accuracy.toFixed(0)}%
+              {formatPercentage(recap.accuracy, locale, 0)}
             </div>
           </div>
           <div className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
@@ -330,7 +334,7 @@ export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
       {/* Timestamp */}
       <div className="text-center text-sm text-gray-500 dark:text-gray-400">
         {t('recap.generatedAt', {
-          date: new Date(recap.createdAt).toLocaleString(),
+          date: formatDateTime(recap.createdAt, locale),
         })}
       </div>
 

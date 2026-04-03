@@ -454,12 +454,12 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 
 - [ ] 20. Implement internationalization (i18n)
-  - [ ] 20.1 Create translation files for all languages
+  - [x] 20.1 Create translation files for all languages
     - Write EN, FR, DE, SW translation files for UI text, labels, messages
     - Translate match event descriptions and prediction prompts
     - _Requirements: 8.1, 8.5_
   
-  - [ ] 20.2 Implement locale detection and switching
+  - [x] 20.2 Implement locale detection and switching
     - Detect browser language preference on app load
     - Implement language selector component
     - Persist language preference to localStorage
@@ -473,7 +473,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 34: Recap localization**
     - **Validates: Requirements 8.2, 8.3, 8.4, 8.5, 8.7**
   
-  - [ ] 20.4 Implement locale-specific formatting
+  - [x] 20.4 Implement locale-specific formatting
     - Format timestamps using locale conventions
     - Format numbers and scores using locale conventions
     - _Requirements: 8.6_
@@ -488,19 +488,19 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test locale persistence
 
 - [ ] 21. Implement PWA offline support
-  - [ ] 21.1 Configure service worker caching strategies
+  - [x] 21.1 Configure service worker caching strategies
     - Implement cache-first for static assets (JS, CSS, images)
     - Implement network-first with cache fallback for API responses
     - Implement network-only for real-time WebSocket data
     - _Requirements: 6.2_
   
-  - [ ] 21.2 Implement offline indicator and state management
+  - [x] 21.2 Implement offline indicator and state management
     - Display offline banner when network connectivity lost
     - Show cached UI with last known state
     - Queue prediction submissions for sync on reconnect
     - _Requirements: 6.4, 6.5_
   
-  - [ ] 21.3 Implement low-bandwidth mode
+  - [x] 21.3 Implement low-bandwidth mode
     - Add toggle for low-bandwidth mode in settings
     - Reduce WebSocket message frequency
     - Transmit only essential match events
@@ -511,7 +511,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test offline mode behavior
     - Test online/offline transition
 
-- [ ] 22. Optimize frontend performance
+- [-] 22. Optimize frontend performance
   - [ ] 22.1 Implement code splitting and lazy loading
     - Split routes for room lobby, match view, recap view
     - Lazy load heavy components (WrappedRecapView)
@@ -540,7 +540,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
 ### Phase 4: Integration and End-to-End Testing
 
 - [ ] 24. Implement complete match event flow
-  - [ ] 24.1 Wire ingestion → EventBridge → room state → WebSocket broadcast
+  - [x] 24.1 Wire ingestion → EventBridge → room state → WebSocket broadcast
     - Verify events flow from XML feed to frontend display
     - Test with all supported event types (goal, card, corner, shot, possession)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_

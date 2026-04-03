@@ -1,26 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PWAStatusIndicator } from './components/PWAStatus';
+import { LowBandwidthIndicator } from './components/LowBandwidthIndicator';
+import { SettingsPanel } from './components/SettingsPanel';
 import { LanguageSelector } from './components/LanguageSelector';
-import { RoomLobby } from './components/RoomLobby';
-import { MatchTimeline } from './components/MatchTimeline';
-import { LivePitch } from './components/LivePitch';
-import { PredictionWidget } from './components/PredictionWidget';
-import { MobilePredictionSheet } from './components/MobilePredictionSheet';
-import { Leaderboard } from './components/Leaderboard';
-import { WrappedRecapView } from './components/WrappedRecapView';
 import { Toast } from './components/Toast';
 import { useAppStore } from './store';
 import { loadDemoData } from './demo-data';
 import { useDarkMode } from './hooks/useDarkMode';
 
+// Lazy load heavy components for better performance
+const RoomLobby = lazy(() => import('./components/RoomLobby').then(m => ({ default: m.RoomLobby })));
+const MatchTimeline = lazy(() => import('./components/MatchTimeline').then(m => ({ default: m.MatchTimeline })));
+const LivePitch = lazy(() => import('./components/LivePitch').then(m => ({ default: m.LivePitch })));
+const PredictionWidget = lazy(() => import('./components/PredictionWidget').then(m => ({ default: m.PredictionWidget })));
+const MobilePredictionSheet = lazy(() => import('./components/MobilePredictionSheet').then(m => ({ default: m.MobilePredictionSheet })));
+const Leaderboard = lazy(() => import('./components/Leaderboard').then(m => ({ default: m.Leaderboard })));
+const WrappedRecapView = lazy(() => import('./components/WrappedRecapView').then(m => ({ default: m.WrappedRecapView })));
+
 type View = 'lobby' | 'match' | 'leaderboard' | 'recap';
+
+// Loading component for Suspense fallback
+function LoadingSpinner({ isDark }: { isDark: boolean }) {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className={`animate-spin rounded-full h-12 w-12 border-4 ${
+        isDark 
+          ? 'border-gray-700 border-t-blue-500' 
+          : 'border-gray-200 border-t-blue-600'
+      }`}></div>
+    </div>
+  );
+}
 
 function App() {
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<View>('lobby');
   const [currentMatchInfo, setCurrentMatchInfo] = useState<{ match: string; code: string; theme: string; matchId: string } | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { user, setUser } = useAppStore();
   const store = useAppStore();
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
@@ -60,6 +78,13 @@ function App() {
         : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'
     }`}>
       <PWAStatusIndicator />
+      <LowBandwidthIndicator />
+      <SettingsPanel
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        isDark={isDark}
+        onToggleDarkMode={toggleDarkMode}
+      />
       
       {/* Modern iOS-style Header with Glass Effect */}
       <header className={`sticky top-0 z-50 backdrop-blur-xl border-b ${
@@ -88,17 +113,17 @@ function App() {
             <div className="flex items-center space-x-2">
               <LanguageSelector />
               
-              {/* Dark Mode Toggle */}
+              {/* Settings Button */}
               <button
-                onClick={toggleDarkMode}
+                onClick={() => setIsSettingsOpen(true)}
                 className={`p-2.5 rounded-xl transition-all transform hover:scale-110 active:scale-95 ${
                   isDark
-                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                    : 'bg-gray-800/10 text-gray-700 hover:bg-gray-800/20'
+                    ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-700'
+                    : 'bg-gray-200/50 text-gray-700 hover:bg-gray-200'
                 }`}
-                aria-label="Toggle dark mode"
+                aria-label="Settings"
               >
-                {isDark ? '☀️' : '🌙'}
+                ⚙️
               </button>
 
               {/* User Profile Picture */}
@@ -231,18 +256,19 @@ function App() {
 
         {/* View Content */}
         <div className="animate-fadeIn">
-          {currentView === 'lobby' && (
-            <RoomLobby 
-              onJoinRoom={(matchInfo) => {
-                if (matchInfo) {
-                  setCurrentMatchInfo(matchInfo);
-                }
-                setCurrentView('match');
-              }} 
-            />
-          )}
-          
-          {currentView === 'match' && (
+          <Suspense fallback={<LoadingSpinner isDark={isDark} />}>
+            {currentView === 'lobby' && (
+              <RoomLobby 
+                onJoinRoom={(matchInfo) => {
+                  if (matchInfo) {
+                    setCurrentMatchInfo(matchInfo);
+                  }
+                  setCurrentView('match');
+                }} 
+              />
+            )}
+            
+            {currentView === 'match' && (
             <div className="space-y-4">
               {/* Match Info Header */}
               {currentMatchInfo && (
@@ -320,9 +346,10 @@ function App() {
             </div>
           )}
 
-          {currentView === 'leaderboard' && <Leaderboard />}
-          
-          {currentView === 'recap' && <WrappedRecapView recap={sampleRecap} />}
+            {currentView === 'leaderboard' && <Leaderboard />}
+            
+            {currentView === 'recap' && <WrappedRecapView recap={sampleRecap} />}
+          </Suspense>
         </div>
       </main>
 

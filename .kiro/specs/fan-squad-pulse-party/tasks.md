@@ -399,7 +399,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test room code validation
     - Test room list filtering
   
-  - [-] 18.3 Create MatchTimeline component
+  - [x] 18.3 Create MatchTimeline component
     - Display match events as cards with icons and timestamps
     - Implement auto-scroll to latest event
     - Localize event descriptions using i18n
@@ -410,7 +410,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test auto-scroll behavior
     - Test localized descriptions
   
-  - [~] 18.5 Create PredictionWidget component
+  - [x] 18.5 Create PredictionWidget component
     - Display prediction window with countdown timer
     - Render multiple choice options as buttons
     - Implement submit button with loading state
@@ -423,7 +423,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test disabled state after expiration
     - Test result feedback display
   
-  - [~] 18.7 Create Leaderboard component
+  - [x] 18.7 Create Leaderboard component
     - Display user rank, name, points, streak in table format
     - Highlight current user row
     - Implement smooth rank transition animations
@@ -434,7 +434,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test current user highlighting
     - Test rank sorting
   
-  - [~] 18.9 Create WrappedRecapView component
+  - [ ] 18.9 Create WrappedRecapView component
     - Display personal stats with animations (total points, rank, accuracy, streak, clutch moments)
     - Implement share button for social media
     - Show historical recap access

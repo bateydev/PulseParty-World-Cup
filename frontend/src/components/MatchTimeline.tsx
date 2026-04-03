@@ -47,7 +47,10 @@ export function MatchTimeline() {
   // Auto-scroll to latest event
   useEffect(() => {
     if (timelineEndRef.current && matchEvents.length > 0) {
-      timelineEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      // Check if scrollIntoView is available (not available in test environment)
+      if (typeof timelineEndRef.current.scrollIntoView === 'function') {
+        timelineEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
     }
   }, [matchEvents]);
 

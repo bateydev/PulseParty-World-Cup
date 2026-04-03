@@ -9,6 +9,7 @@ import { PredictionWidget } from './components/PredictionWidget';
 import { MobilePredictionSheet } from './components/MobilePredictionSheet';
 import { Leaderboard } from './components/Leaderboard';
 import { WrappedRecapView } from './components/WrappedRecapView';
+import { Toast } from './components/Toast';
 import { useAppStore } from './store';
 import { loadDemoData } from './demo-data';
 import { useDarkMode } from './hooks/useDarkMode';
@@ -18,7 +19,8 @@ type View = 'lobby' | 'match' | 'leaderboard' | 'recap';
 function App() {
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState<View>('lobby');
-  const [currentMatchInfo, setCurrentMatchInfo] = useState<{ match: string; code: string; theme: string } | null>(null);
+  const [currentMatchInfo, setCurrentMatchInfo] = useState<{ match: string; code: string; theme: string; matchId: string } | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const { user, setUser } = useAppStore();
   const store = useAppStore();
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
@@ -271,7 +273,7 @@ function App() {
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(currentMatchInfo.code);
-                        alert('Room code copied!');
+                        setToastMessage('Room code copied!');
                       }}
                       className="ml-2 px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl text-sm font-semibold shadow-lg hover:scale-105 active:scale-95 transition-all"
                     >
@@ -323,6 +325,15 @@ function App() {
           {currentView === 'recap' && <WrappedRecapView recap={sampleRecap} />}
         </div>
       </main>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type="success"
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </div>
   );
 }

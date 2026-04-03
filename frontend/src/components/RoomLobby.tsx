@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
 
 interface RoomLobbyProps {
-  onJoinRoom: (matchInfo?: { match: string; code: string; theme: string }) => void;
+  onJoinRoom: (matchInfo?: { match: string; code: string; theme: string; matchId: string }) => void;
 }
 
 export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
   const { t } = useTranslation();
-  const [selectedTheme, setSelectedTheme] = useState<'Country' | 'Club' | 'Private'>('Country');
+  const [selectedTheme, setSelectedTheme] = useState<'Country' | 'Club' | 'Private' | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<{ id: string; name: string } | null>(null);
   const [roomCode, setRoomCode] = useState('');
   const [activeTab, setActiveTab] = useState<'create' | 'join' | 'discover'>('create');
   const [showModal, setShowModal] = useState(false);
@@ -20,23 +21,71 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
     { value: 'Private', icon: '🔒', color: 'from-purple-500 to-pink-600', label: t('room.theme_private') },
   ];
 
+  // Available matches by theme
+  // Match IDs align with backend matchId format
+  const matchesByTheme = {
+    Country: [
+      { id: 'match-country-1', name: 'Germany vs France', league: 'UEFA Nations League' },
+      { id: 'match-country-2', name: 'Brazil vs Argentina', league: 'CONMEBOL' },
+      { id: 'match-country-3', name: 'England vs Spain', league: 'International Friendly' },
+      { id: 'match-country-4', name: 'Portugal vs Italy', league: 'UEFA Nations League' },
+    ],
+    Club: [
+      { id: 'match-club-1', name: 'Bayern Munich vs Borussia Dortmund', league: 'Bundesliga' },
+      { id: 'match-club-2', name: 'Real Madrid vs Barcelona', league: 'La Liga' },
+      { id: 'match-club-3', name: 'Manchester City vs Liverpool', league: 'Premier League' },
+      { id: 'match-club-4', name: 'PSG vs Marseille', league: 'Ligue 1' },
+    ],
+    Private: [
+      { id: 'match-private-1', name: 'Custom Match 1', league: 'Private League' },
+      { id: 'match-private-2', name: 'Custom Match 2', league: 'Private League' },
+    ],
+  };
+
+  // Get filtered matches based on selected theme
+  const getFilteredMatches = () => {
+    if (!selectedTheme) return [];
+    return matchesByTheme[selectedTheme];
+  };
+
   const mockRooms = [
-    { code: 'BAY-MUN', match: 'Bayern Munich vs Borussia Dortmund', players: 12, theme: 'Club', homeTeam: 'Bayern Munich', awayTeam: 'Borussia Dortmund' },
-    { code: 'GER-FRA', match: 'Germany vs France', players: 8, theme: 'Country', homeTeam: 'Germany', awayTeam: 'France' },
-    { code: 'LIVE-01', match: 'Real Madrid vs Barcelona', players: 15, theme: 'Club', homeTeam: 'Real Madrid', awayTeam: 'Barcelona' },
+    { code: 'BAYMUN', matchId: 'match-club-1', match: 'Bayern Munich vs Borussia Dortmund', players: 12, theme: 'Club', homeTeam: 'Bayern Munich', awayTeam: 'Borussia Dortmund' },
+    { code: 'GERFRA', matchId: 'match-country-1', match: 'Germany vs France', players: 8, theme: 'Country', homeTeam: 'Germany', awayTeam: 'France' },
+    { code: 'LIVE01', matchId: 'match-club-2', match: 'Real Madrid vs Barcelona', players: 15, theme: 'Club', homeTeam: 'Real Madrid', awayTeam: 'Barcelona' },
   ];
 
-  // Generate a random room code
+  // Generate a random room code (6 characters to match backend format)
+  // Backend uses format: ABCDEF (no dash, 6 chars)
   const generateRoomCode = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const nums = '0123456789';
-    return `${chars[Math.floor(Math.random() * chars.length)]}${chars[Math.floor(Math.random() * chars.length)]}${chars[Math.floor(Math.random() * chars.length)]}-${nums[Math.floor(Math.random() * nums.length)]}${nums[Math.floor(Math.random() * nums.length)]}${nums[Math.floor(Math.random() * nums.length)]}`;
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude similar chars (I/1, O/0)
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return code;
   };
 
   // Button handlers with feedback
   const handleCreateRoom = () => {
+    if (!selectedMatch) return;
+    
     const generatedCode = generateRoomCode();
-    console.log('Creating room with theme:', selectedTheme, 'Code:', generatedCode);
+    console.log('Creating room with:', {
+      theme: selectedTheme,
+      matchId: selectedMatch.id,
+      matchName: selectedMatch.name,
+      roomCode: generatedCode
+    });
+    
+    // TODO: When connecting to backend, send WebSocket message:
+    // {
+    //   action: 'createRoom',
+    //   payload: {
+    //     matchId: selectedMatch.id,
+    //     theme: selectedTheme
+    //   }
+    // }
+    // Backend will return the actual room code
     
     setModalContent({
       emoji: '🎮',
@@ -48,12 +97,27 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
     // Navigate to match after 3 seconds (more time to see code)
     setTimeout(() => {
       setShowModal(false);
-      onJoinRoom({ match: 'Live Match', code: generatedCode, theme: selectedTheme });
+      onJoinRoom({ 
+        match: selectedMatch.name, 
+        code: generatedCode, 
+        theme: selectedTheme!,
+        matchId: selectedMatch.id 
+      });
     }, 3000);
   };
 
   const handleJoinRoom = () => {
     console.log('Joining room with code:', roomCode);
+    
+    // TODO: When connecting to backend, send WebSocket message:
+    // {
+    //   action: 'joinRoom',
+    //   payload: {
+    //     roomCode: roomCode
+    //   }
+    // }
+    // Backend will return room details (matchId, theme, etc.)
+    
     setModalContent({
       emoji: '🚪',
       title: 'Joining Room',
@@ -64,12 +128,21 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
     // Navigate to match after 1.5 seconds
     setTimeout(() => {
       setShowModal(false);
-      onJoinRoom({ match: 'Live Match', code: roomCode, theme: 'Club' });
+      onJoinRoom({ match: 'Live Match', code: roomCode, theme: 'Club', matchId: 'match-unknown' });
     }, 1500);
   };
 
   const handleJoinDiscoveredRoom = (room: any) => {
     console.log('Joining discovered room:', room);
+    
+    // TODO: When connecting to backend, send WebSocket message:
+    // {
+    //   action: 'joinRoom',
+    //   payload: {
+    //     roomCode: room.code
+    //   }
+    // }
+    
     setModalContent({
       emoji: '⚽',
       title: room.match,
@@ -80,7 +153,7 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
     // Navigate to match after 2 seconds
     setTimeout(() => {
       setShowModal(false);
-      onJoinRoom({ match: room.match, code: room.code, theme: room.theme });
+      onJoinRoom({ match: room.match, code: room.code, theme: room.theme, matchId: room.matchId || 'match-unknown' });
     }, 2000);
   };
 
@@ -108,50 +181,123 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
       {/* Create Room */}
       {activeTab === 'create' && (
         <div className="space-y-4">
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
-              Choose Room Theme
-            </h3>
-            
-            <div className="grid grid-cols-1 gap-3">
-              {themes.map((theme) => (
-                <button
-                  key={theme.value}
-                  onClick={() => setSelectedTheme(theme.value as any)}
-                  className={`relative overflow-hidden rounded-2xl p-6 transition-all transform active:scale-98 ${
-                    selectedTheme === theme.value
-                      ? 'ring-4 ring-blue-500 dark:ring-blue-400 scale-105'
-                      : 'hover:scale-102'
-                  }`}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${theme.color} opacity-90`}></div>
-                  <div className="relative flex items-center justify-between text-white">
-                    <div className="flex items-center space-x-4">
-                      <span className="text-4xl">{theme.icon}</span>
-                      <div className="text-left">
-                        <p className="font-bold text-lg">{theme.label}</p>
-                        <p className="text-sm opacity-90">
-                          {theme.value === 'Private' ? 'Invite only' : 'Public room'}
-                        </p>
+          {/* Step 1: Theme Selection */}
+          {!selectedTheme && (
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">
+                Step 1: Choose Room Theme
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Select a theme to see available matches
+              </p>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {themes.map((theme) => (
+                  <button
+                    key={theme.value}
+                    onClick={() => setSelectedTheme(theme.value as any)}
+                    className="relative overflow-hidden rounded-2xl p-6 transition-all transform hover:scale-102 active:scale-98"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${theme.color} opacity-90`}></div>
+                    <div className="relative flex items-center justify-between text-white">
+                      <div className="flex items-center space-x-4">
+                        <span className="text-4xl">{theme.icon}</span>
+                        <div className="text-left">
+                          <p className="font-bold text-lg">{theme.label}</p>
+                          <p className="text-sm opacity-90">
+                            {theme.value === 'Private' ? 'Invite only' : 'Public room'}
+                          </p>
+                        </div>
                       </div>
+                      <span className="text-2xl">→</span>
                     </div>
-                    {selectedTheme === theme.value && (
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <span className="text-green-500">✓</span>
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
+          )}
 
-            <button 
-              onClick={handleCreateRoom}
-              className="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all"
-            >
-              <span className="text-lg">🎮 Create Room</span>
-            </button>
-          </div>
+          {/* Step 2: Match Selection */}
+          {selectedTheme && !selectedMatch && (
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 animate-slideDown">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    Step 2: Select Match
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedTheme} matches available
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedTheme(null)}
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  ← Change Theme
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {getFilteredMatches().map((match) => (
+                  <button
+                    key={match.id}
+                    onClick={() => setSelectedMatch(match)}
+                    className="w-full text-left p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border-2 border-transparent hover:border-blue-500 transition-all transform hover:scale-102 active:scale-98"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900 dark:text-white">{match.name}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{match.league}</p>
+                      </div>
+                      <span className="text-2xl">⚽</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Confirm and Create */}
+          {selectedTheme && selectedMatch && (
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl border border-gray-200 dark:border-gray-700 animate-slideDown">
+              <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+                Ready to Create Room
+              </h3>
+              
+              {/* Summary */}
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-3xl">
+                    {themes.find(t => t.value === selectedTheme)?.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Theme</p>
+                    <p className="font-bold text-gray-900 dark:text-white">{selectedTheme}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Match</p>
+                    <p className="font-bold text-gray-900 dark:text-white">{selectedMatch.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">ID: {selectedMatch.id}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setSelectedMatch(null);
+                  }}
+                  className="flex-1 py-3 px-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold rounded-xl hover:scale-105 active:scale-95 transition-all"
+                >
+                  ← Back
+                </button>
+                <button 
+                  onClick={handleCreateRoom}
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all"
+                >
+                  🎮 Create Room
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -179,9 +325,9 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
               type="text"
               value={roomCode}
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              placeholder="ABC-123"
+              placeholder="ABC123"
               className="w-full px-6 py-4 text-center text-2xl font-bold tracking-widest bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all"
-              maxLength={7}
+              maxLength={6}
             />
 
             <button 

@@ -206,10 +206,14 @@ export const useAppStore = create<AppState>()(
                   get().setActivePredictionWindow(null);
                   break;
                 case 'leaderboardUpdate':
-                  get().setLeaderboard(message.payload.leaderboard || message.payload);
+                  get().setLeaderboard(
+                    message.payload.leaderboard || message.payload
+                  );
                   break;
                 case 'participantUpdate':
-                  get().setParticipants(message.payload.participants || message.payload);
+                  get().setParticipants(
+                    message.payload.participants || message.payload
+                  );
                   break;
                 case 'scoreUpdate':
                   get().updateScore(message.payload.score || message.payload);
@@ -291,7 +295,7 @@ export const useAppStore = create<AppState>()(
         return new Promise((resolve, reject) => {
           const state = get();
 
-          if (!state.wsConnected) {
+          if (!state.wsConnected || !state.wsManager) {
             reject(new Error('WebSocket not connected'));
             return;
           }
@@ -304,36 +308,47 @@ export const useAppStore = create<AppState>()(
 
           state.sendMessage(message);
 
-          // Listen for room creation response
-          const originalOnMessage = state.ws?.onmessage;
-          if (state.ws) {
-            state.ws.onmessage = (event) => {
-              try {
-                const response = JSON.parse(event.data);
-                if (response.type === 'roomCreated') {
-                  get().setCurrentRoom(response.payload.room);
-                  resolve(response.payload.room.roomCode);
-                  // Restore original handler
-                  if (state.ws && originalOnMessage) {
-                    state.ws.onmessage = originalOnMessage;
-                  }
-                } else if (response.type === 'error') {
-                  reject(new Error(response.payload.message));
-                  if (state.ws && originalOnMessage) {
-                    state.ws.onmessage = originalOnMessage;
-                  }
-                } else if (originalOnMessage && state.ws) {
-                  // Pass through other messages
-                  originalOnMessage.call(state.ws, event);
-                }
-              } catch (error) {
-                reject(error);
+          // Store original handler
+          const originalHandler = state.wsManager['config'].onMessage;
+
+          // Set up a one-time listener for the response
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const responseHandler = (data: any) => {
+            if (data.type === 'roomCreated') {
+              clearTimeout(timeoutId);
+              // Restore original handler
+              if (state.wsManager) {
+                state.wsManager['config'].onMessage = originalHandler;
               }
-            };
-          }
+              get().setCurrentRoom(data.payload.room);
+              resolve(data.payload.room.roomCode);
+            } else if (
+              data.type === 'error' &&
+              data.payload.action === 'createRoom'
+            ) {
+              clearTimeout(timeoutId);
+              // Restore original handler
+              if (state.wsManager) {
+                state.wsManager['config'].onMessage = originalHandler;
+              }
+              reject(new Error(data.payload.message));
+            }
+          };
+
+          // Temporarily override message handler
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          state.wsManager['config'].onMessage = (data: any) => {
+            responseHandler(data);
+            // Also call original handler for other message processing
+            originalHandler?.(data);
+          };
 
           // Timeout after 5 seconds
-          setTimeout(() => {
+          const timeoutId = window.setTimeout(() => {
+            // Restore original handler
+            if (state.wsManager) {
+              state.wsManager['config'].onMessage = originalHandler;
+            }
             reject(new Error('Room creation timeout'));
           }, 5000);
         });
@@ -343,7 +358,7 @@ export const useAppStore = create<AppState>()(
         return new Promise((resolve, reject) => {
           const state = get();
 
-          if (!state.wsConnected) {
+          if (!state.wsConnected || !state.wsManager) {
             reject(new Error('WebSocket not connected'));
             return;
           }
@@ -356,41 +371,49 @@ export const useAppStore = create<AppState>()(
 
           state.sendMessage(message);
 
-          // Listen for join response
-          const originalOnMessage = state.ws?.onmessage;
-          if (state.ws) {
-            state.ws.onmessage = (event) => {
-              try {
-                const response = JSON.parse(event.data);
-                if (
-                  response.type === 'roomJoined' ||
-                  response.type === 'roomState'
-                ) {
-                  if (response.payload.room) {
-                    get().setCurrentRoom(response.payload.room);
-                  }
-                  resolve();
-                  // Restore original handler
-                  if (state.ws && originalOnMessage) {
-                    state.ws.onmessage = originalOnMessage;
-                  }
-                } else if (response.type === 'error') {
-                  reject(new Error(response.payload.message));
-                  if (state.ws && originalOnMessage) {
-                    state.ws.onmessage = originalOnMessage;
-                  }
-                } else if (originalOnMessage && state.ws) {
-                  // Pass through other messages
-                  originalOnMessage.call(state.ws, event);
-                }
-              } catch (error) {
-                reject(error);
+          // Store original handler
+          const originalHandler = state.wsManager['config'].onMessage;
+
+          // Set up a one-time listener for the response
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const responseHandler = (data: any) => {
+            if (data.type === 'roomJoined' || data.type === 'roomState') {
+              clearTimeout(timeoutId);
+              // Restore original handler
+              if (state.wsManager) {
+                state.wsManager['config'].onMessage = originalHandler;
               }
-            };
-          }
+              if (data.payload.room) {
+                get().setCurrentRoom(data.payload.room);
+              }
+              resolve();
+            } else if (
+              data.type === 'error' &&
+              data.payload.action === 'joinRoom'
+            ) {
+              clearTimeout(timeoutId);
+              // Restore original handler
+              if (state.wsManager) {
+                state.wsManager['config'].onMessage = originalHandler;
+              }
+              reject(new Error(data.payload.message));
+            }
+          };
+
+          // Temporarily override message handler
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          state.wsManager['config'].onMessage = (data: any) => {
+            responseHandler(data);
+            // Also call original handler for other message processing
+            originalHandler?.(data);
+          };
 
           // Timeout after 5 seconds
-          setTimeout(() => {
+          const timeoutId = window.setTimeout(() => {
+            // Restore original handler
+            if (state.wsManager) {
+              state.wsManager['config'].onMessage = originalHandler;
+            }
             reject(new Error('Room join timeout'));
           }, 5000);
         });

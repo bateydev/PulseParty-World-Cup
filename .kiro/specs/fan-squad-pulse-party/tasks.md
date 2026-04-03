@@ -368,14 +368,14 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test localStorage persistence
     - Test WebSocket message handling
 
-- [ ] 17. Implement WebSocket client integration
+- [x] 17. Implement WebSocket client integration
   - [x] 17.1 Create WebSocket connection manager
     - Write connectWebSocket function with automatic reconnection
     - Implement exponential backoff retry logic
     - Handle connection, disconnection, and message events
     - _Requirements: 9.1, 7.7_
   
-  - [-] 17.2 Implement message handlers for state updates
+  - [x] 17.2 Implement message handlers for state updates
     - Handle match event messages and update matchEvents state
     - Handle prediction window messages and update activePredictionWindow state
     - Handle leaderboard messages and update leaderboard state
@@ -388,7 +388,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test error handling for malformed messages
 
 - [ ] 18. Implement core React components
-  - [~] 18.1 Create RoomLobby component
+  - [x] 18.1 Create RoomLobby component
     - Implement theme selection UI (Country/Club/Private buttons)
     - Implement room code input and join button
     - Implement public room list with match and theme filters
@@ -399,7 +399,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test room code validation
     - Test room list filtering
   
-  - [~] 18.3 Create MatchTimeline component
+  - [-] 18.3 Create MatchTimeline component
     - Display match events as cards with icons and timestamps
     - Implement auto-scroll to latest event
     - Localize event descriptions using i18n

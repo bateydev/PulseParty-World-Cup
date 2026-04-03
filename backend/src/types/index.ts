@@ -89,6 +89,28 @@ export interface RoomRecap {
   engagementMetrics: Record<string, number>;
 }
 
+// User Types
+export interface GuestUser {
+  userId: string;
+  displayName: string;
+  isGuest: true;
+  locale: string;
+  createdAt: string;
+  ttl: number;
+}
+
+export interface AuthenticatedUser {
+  userId: string;
+  cognitoId: string;
+  email: string;
+  displayName: string;
+  isGuest: false;
+  locale: string;
+  createdAt: string;
+}
+
+export type User = GuestUser | AuthenticatedUser;
+
 // WebSocket Message Types
 export interface WebSocketMessage {
   action:
@@ -96,6 +118,7 @@ export interface WebSocketMessage {
     | 'joinRoom'
     | 'submitPrediction'
     | 'leaveRoom'
-    | 'heartbeat';
+    | 'heartbeat'
+    | 'authenticate';
   payload: Record<string, unknown>;
 }

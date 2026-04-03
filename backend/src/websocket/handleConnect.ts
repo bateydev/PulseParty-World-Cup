@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { putItem, getItem, queryItems } from '../utils/dynamodb';
+import { generateGuestUser } from '../auth/guestUser';
 
 const getTableName = () => process.env.TABLE_NAME || '';
 const getWebSocketEndpoint = () => process.env.WEBSOCKET_API_ENDPOINT || '';
@@ -69,8 +70,19 @@ export async function handler(
 
   try {
     // Extract query parameters
-    const userId = event.queryStringParameters?.userId || `guest-${Date.now()}`;
+    let userId = event.queryStringParameters?.userId;
     const roomId = event.queryStringParameters?.roomId;
+
+    // Generate guest user if no userId provided
+    if (!userId) {
+      const locale = event.queryStringParameters?.locale || 'en';
+      const guestUser = await generateGuestUser(locale);
+      userId = guestUser.userId;
+      console.log('Generated guest user:', {
+        userId: guestUser.userId,
+        displayName: guestUser.displayName,
+      });
+    }
 
     // Store connection entity in DynamoDB
     const connectionEntity: ConnectionEntity = {

@@ -7,6 +7,7 @@ import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { Construct } from 'constructs';
 
 export class PulsePartyStack extends cdk.Stack {
@@ -14,6 +15,9 @@ export class PulsePartyStack extends cdk.Stack {
   public readonly eventBus: events.EventBus;
   public readonly deadLetterQueue: sqs.Queue;
   public readonly webSocketApi: apigatewayv2.CfnApi;
+  public readonly userPool: cognito.UserPool;
+  public readonly userPoolClient: cognito.UserPoolClient;
+  public readonly identityPool: cognito.CfnIdentityPool;
   public readonly connectFunction: lambda.Function;
   public readonly disconnectFunction: lambda.Function;
   public readonly defaultFunction: lambda.Function;
@@ -90,6 +94,172 @@ export class PulsePartyStack extends cdk.Stack {
       value: 'GSI1',
       description: 'GSI for match+theme discovery',
       exportName: 'PulsePartyGSI1Name',
+    });
+
+    // ========================================
+    // AWS Cognito User Pool and Identity Pool
+    // Requirements: 7.3, 7.4
+    // ========================================
+
+    // Create Cognito User Pool for authenticated users
+    this.userPool = new cognito.UserPool(this, 'PulsePartyUserPool', {
+      userPoolName: 'PulsePartyUserPool',
+      
+      // Self-service sign-up enabled
+      selfSignUpEnabled: true,
+      
+      // Sign-in with email or username
+      signInAliases: {
+        email: true,
+        username: true,
+      },
+      
+      // Auto-verify email addresses
+      autoVerify: {
+        email: true,
+      },
+      
+      // Standard attributes
+      standardAttributes: {
+        email: {
+          required: true,
+          mutable: true,
+        },
+        preferredUsername: {
+          required: false,
+          mutable: true,
+        },
+      },
+      
+      // Custom attributes for display name and locale
+      customAttributes: {
+        displayName: new cognito.StringAttribute({ minLen: 1, maxLen: 50, mutable: true }),
+        locale: new cognito.StringAttribute({ minLen: 2, maxLen: 5, mutable: true }),
+      },
+      
+      // Password policy
+      passwordPolicy: {
+        minLength: 8,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: false,
+      },
+      
+      // Account recovery
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      
+      // Removal policy - use RETAIN for production
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+
+    // Create User Pool Client for frontend application
+    this.userPoolClient = new cognito.UserPoolClient(this, 'PulsePartyUserPoolClient', {
+      userPool: this.userPool,
+      userPoolClientName: 'PulsePartyWebClient',
+      
+      // OAuth flows
+      authFlows: {
+        userPassword: true,
+        userSrp: true,
+        custom: false,
+      },
+      
+      // Token validity
+      accessTokenValidity: cdk.Duration.hours(1),
+      idTokenValidity: cdk.Duration.hours(1),
+      refreshTokenValidity: cdk.Duration.days(30),
+      
+      // Prevent client secret (for public web clients)
+      generateSecret: false,
+      
+      // Enable token revocation
+      enableTokenRevocation: true,
+    });
+
+    // Create Identity Pool for AWS credentials (optional, for future use)
+    this.identityPool = new cognito.CfnIdentityPool(this, 'PulsePartyIdentityPool', {
+      identityPoolName: 'PulsePartyIdentityPool',
+      allowUnauthenticatedIdentities: true, // Allow guest users
+      cognitoIdentityProviders: [
+        {
+          clientId: this.userPoolClient.userPoolClientId,
+          providerName: this.userPool.userPoolProviderName,
+        },
+      ],
+    });
+
+    // Create IAM roles for authenticated and unauthenticated users
+    const authenticatedRole = new iam.Role(this, 'CognitoAuthenticatedRole', {
+      assumedBy: new iam.FederatedPrincipal(
+        'cognito-identity.amazonaws.com',
+        {
+          StringEquals: {
+            'cognito-identity.amazonaws.com:aud': this.identityPool.ref,
+          },
+          'ForAnyValue:StringLike': {
+            'cognito-identity.amazonaws.com:amr': 'authenticated',
+          },
+        },
+        'sts:AssumeRoleWithWebIdentity'
+      ),
+      description: 'Role for authenticated Cognito users',
+    });
+
+    const unauthenticatedRole = new iam.Role(this, 'CognitoUnauthenticatedRole', {
+      assumedBy: new iam.FederatedPrincipal(
+        'cognito-identity.amazonaws.com',
+        {
+          StringEquals: {
+            'cognito-identity.amazonaws.com:aud': this.identityPool.ref,
+          },
+          'ForAnyValue:StringLike': {
+            'cognito-identity.amazonaws.com:amr': 'unauthenticated',
+          },
+        },
+        'sts:AssumeRoleWithWebIdentity'
+      ),
+      description: 'Role for unauthenticated (guest) users',
+    });
+
+    // Attach roles to Identity Pool
+    new cognito.CfnIdentityPoolRoleAttachment(this, 'IdentityPoolRoleAttachment', {
+      identityPoolId: this.identityPool.ref,
+      roles: {
+        authenticated: authenticatedRole.roleArn,
+        unauthenticated: unauthenticatedRole.roleArn,
+      },
+    });
+
+    // Output Cognito details
+    new cdk.CfnOutput(this, 'UserPoolId', {
+      value: this.userPool.userPoolId,
+      description: 'Cognito User Pool ID',
+      exportName: 'PulsePartyUserPoolId',
+    });
+
+    new cdk.CfnOutput(this, 'UserPoolArn', {
+      value: this.userPool.userPoolArn,
+      description: 'Cognito User Pool ARN',
+      exportName: 'PulsePartyUserPoolArn',
+    });
+
+    new cdk.CfnOutput(this, 'UserPoolClientId', {
+      value: this.userPoolClient.userPoolClientId,
+      description: 'Cognito User Pool Client ID',
+      exportName: 'PulsePartyUserPoolClientId',
+    });
+
+    new cdk.CfnOutput(this, 'IdentityPoolId', {
+      value: this.identityPool.ref,
+      description: 'Cognito Identity Pool ID',
+      exportName: 'PulsePartyIdentityPoolId',
+    });
+
+    new cdk.CfnOutput(this, 'CognitoRegion', {
+      value: this.region,
+      description: 'AWS Region for Cognito',
+      exportName: 'PulsePartyCognitoRegion',
     });
 
     // Dead-letter queue for failed event processing
@@ -491,6 +661,9 @@ export class PulsePartyStack extends cdk.Stack {
       role: lambdaExecutionRole,
       environment: {
         TABLE_NAME: this.table.tableName,
+        USER_POOL_ID: this.userPool.userPoolId,
+        USER_POOL_CLIENT_ID: this.userPoolClient.userPoolClientId,
+        REGION: this.region,
       },
       timeout: cdk.Duration.seconds(10),
       description: 'WebSocket $connect handler - stores connection ID',

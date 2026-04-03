@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PWA Icon Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    canvas { border: 1px solid #ccc; margin: 10px; }
+    .icon-container { display: flex; flex-wrap: wrap; gap: 20px; }
+  </style>
+</head>
+<body>
+  <h1>PulseParty PWA Icon Generator</h1>
+  <p>Right-click on each canvas and "Save image as..." to download the icons.</p>
+  <div class="icon-container">
+    <div>
+      <h3>192x192 Icon</h3>
+      <canvas id="icon192" width="192" height="192"></canvas>
+    </div>
+    <div>
+      <h3>512x512 Icon</h3>
+      <canvas id="icon512" width="512" height="512"></canvas>
+    </div>
+    <div>
+      <h3>180x180 Apple Touch Icon</h3>
+      <canvas id="iconApple" width="180" height="180"></canvas>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      
+      // Background gradient (blue theme)
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#1e40af'); // blue-800
+      gradient.addColorStop(1, '#3b82f6'); // blue-500
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw pulse wave symbol
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = size * 0.08;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      ctx.beginPath();
+      const centerY = size / 2;
+      const amplitude = size * 0.15;
+      const segments = 8;
+      
+      // Draw stylized pulse/heartbeat line
+      ctx.moveTo(size * 0.1, centerY);
+      ctx.lineTo(size * 0.25, centerY);
+      ctx.lineTo(size * 0.35, centerY - amplitude);
+      ctx.lineTo(size * 0.45, centerY + amplitude * 1.5);
+      ctx.lineTo(size * 0.55, centerY - amplitude * 0.5);
+      ctx.lineTo(size * 0.65, centerY);
+      ctx.lineTo(size * 0.9, centerY);
+      ctx.stroke();
+      
+      // Draw party confetti dots
+      ctx.fillStyle = '#fbbf24'; // yellow-400
+      const dotSize = size * 0.04;
+      const dots = [
+        [0.3, 0.25], [0.5, 0.2], [0.7, 0.3],
+        [0.35, 0.75], [0.6, 0.8], [0.75, 0.7]
+      ];
+      
+      dots.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(size * x, size * y, dotSize, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+    
+    // Generate all icons
+    drawIcon(document.getElementById('icon192'));
+    drawIcon(document.getElementById('icon512'));
+    drawIcon(document.getElementById('iconApple'));
+  </script>
+</body>
+</html>

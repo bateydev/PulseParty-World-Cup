@@ -262,7 +262,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [-] 12. Implement Recap Lambda
+- [x] 12. Implement Recap Lambda
   - [x] 12.1 Create wrapped recap generation
     - Write generateWrappedRecap function to calculate user stats: total points, final rank, accuracy, longest streak, clutch moments
     - Store wrapped recap in DynamoDB with shareable URL
@@ -274,7 +274,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 24: Recap persistence**
     - **Validates: Requirements 5.2, 5.3, 5.5, 5.6, 5.7**
   
-  - [-] 12.3 Create room recap generation
+  - [x] 12.3 Create room recap generation
     - Write generateRoomRecap function to aggregate room stats: total participants, top 3 performers, most predicted event, engagement metrics
     - Store room recap in DynamoDB
     - _Requirements: 5.1, 5.4_
@@ -283,7 +283,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 21: Room recap generation**
     - **Validates: Requirements 5.1, 5.4**
   
-  - [~] 12.5 Implement recap retrieval
+  - [x] 12.5 Implement recap retrieval
     - Write getUserRecaps function to query historical recaps for a user
     - Broadcast recaps to room participants on match conclusion
     - _Requirements: 5.7_
@@ -293,8 +293,8 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test room recap aggregation with multiple users
     - Test recap retrieval query
 
-- [ ] 13. Implement authentication and user management
-  - [~] 13.1 Create guest user generation
+- [x] 13. Implement authentication and user management
+  - [x] 13.1 Create guest user generation
     - Write generateGuestUser function to create temporary user ID and display name
     - Store guest user in DynamoDB with session TTL
     - _Requirements: 7.1, 7.2_
@@ -303,7 +303,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 25: Guest user generation**
     - **Validates: Requirements 7.2**
   
-  - [~] 13.3 Integrate AWS Cognito for authenticated users
+  - [x] 13.3 Integrate AWS Cognito for authenticated users
     - Configure Cognito user pool and identity pool
     - Implement sign-in flow with JWT validation
     - Link Cognito ID to user entity in DynamoDB
@@ -314,7 +314,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - **Property 27: Custom display name setting**
     - **Validates: Requirements 7.4, 7.5**
   
-  - [~] 13.5 Implement WebSocket reconnection logic
+  - [x] 13.5 Implement WebSocket reconnection logic
     - Add exponential backoff retry mechanism (5 attempts)
     - Restore user session state on reconnection
     - _Requirements: 7.6, 7.7_
@@ -328,7 +328,7 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test Cognito JWT validation
     - Test reconnection backoff timing
 
-- [~] 14. Checkpoint - Validate recap generation and authentication
+- [x] 14. Checkpoint - Validate recap generation and authentication
   - Deploy Recap Lambda and authentication integration
   - Test wrapped recap and room recap generation
   - Test guest and authenticated user flows
@@ -337,14 +337,14 @@ The implementation follows an incremental approach: infrastructure setup → bac
 
 ### Phase 3: Frontend Implementation
 
-- [ ] 15. Set up React PWA project structure
-  - [~] 15.1 Initialize Vite + React + TypeScript project
+- [-] 15. Set up React PWA project structure
+  - [x] 15.1 Initialize Vite + React + TypeScript project
     - Create frontend directory with Vite configuration
     - Install dependencies: React, Zustand, TailwindCSS, react-i18next, fast-check, Vitest
     - Configure TailwindCSS with mobile-first breakpoints
     - _Requirements: 6.1_
   
-  - [~] 15.2 Configure PWA manifest and service worker
+  - [-] 15.2 Configure PWA manifest and service worker
     - Create web app manifest with app name, icons, theme colors
     - Implement service worker with cache-first strategy for static assets
     - Configure Workbox for offline support

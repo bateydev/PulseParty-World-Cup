@@ -1,0 +1,7 @@
+# PulseParty Rooms - Robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap (update with actual domain when deployed)
+# Sitemap: https://pulseparty.example.com/sitemap.xml

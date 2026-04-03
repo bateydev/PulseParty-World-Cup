@@ -1,8 +1,9 @@
-import React from 'react';
+import { PWAStatusIndicator } from './components/PWAStatus';
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-100">
+      <PWAStatusIndicator />
       <header className="bg-primary-600 text-white p-4">
         <h1 className="text-2xl font-bold">PulseParty Rooms</h1>
       </header>

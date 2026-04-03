@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { handler } from './handleConnect';
 import * as dynamodb from '../utils/dynamodb';
+import * as guestUser from '../auth/guestUser';
 
 // Mock the DynamoDB utilities
 jest.mock('../utils/dynamodb');
@@ -12,6 +13,12 @@ const mockGetItem = dynamodb.getItem as jest.MockedFunction<
 >;
 const mockQueryItems = dynamodb.queryItems as jest.MockedFunction<
   typeof dynamodb.queryItems
+>;
+
+// Mock the guest user generation
+jest.mock('../auth/guestUser');
+const mockGenerateGuestUser = guestUser.generateGuestUser as jest.MockedFunction<
+  typeof guestUser.generateGuestUser
 >;
 
 // Mock AWS SDK
@@ -112,16 +119,57 @@ describe('WebSocket Connection Handler', () => {
     it('should generate guest userId if not provided', async () => {
       const event = createMockEvent();
       mockPutItem.mockResolvedValue();
+      
+      const mockGuestUserId = 'guest-1234567890-abcd1234';
+      const mockGuestDisplayName = 'SwiftTiger123';
+      mockGenerateGuestUser.mockResolvedValue({
+        userId: mockGuestUserId,
+        displayName: mockGuestDisplayName,
+        isGuest: true,
+        locale: 'en',
+        createdAt: new Date().toISOString(),
+        ttl: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+      });
 
       const result = await handler(event);
 
       expect(result.statusCode).toBe(200);
+      expect(mockGenerateGuestUser).toHaveBeenCalledWith('en');
       expect(mockPutItem).toHaveBeenCalledWith({
         TableName: 'TestTable',
         Item: expect.objectContaining({
           PK: `CONNECTION#${mockConnectionId}`,
           SK: 'METADATA',
-          userId: expect.stringMatching(/^guest-\d+$/),
+          userId: mockGuestUserId,
+        }),
+      });
+    });
+
+    it('should generate guest user with provided locale', async () => {
+      const event = createMockEvent({ locale: 'fr' });
+      mockPutItem.mockResolvedValue();
+      
+      const mockGuestUserId = 'guest-1234567890-abcd1234';
+      const mockGuestDisplayName = 'BraveLion456';
+      mockGenerateGuestUser.mockResolvedValue({
+        userId: mockGuestUserId,
+        displayName: mockGuestDisplayName,
+        isGuest: true,
+        locale: 'fr',
+        createdAt: new Date().toISOString(),
+        ttl: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+      });
+
+      const result = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      expect(mockGenerateGuestUser).toHaveBeenCalledWith('fr');
+      expect(mockPutItem).toHaveBeenCalledWith({
+        TableName: 'TestTable',
+        Item: expect.objectContaining({
+          PK: `CONNECTION#${mockConnectionId}`,
+          SK: 'METADATA',
+          userId: mockGuestUserId,
         }),
       });
     });

@@ -13,11 +13,14 @@
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.490.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.967.0",
     "@aws-sdk/client-dynamodb": "^3.490.0",
     "@aws-sdk/client-eventbridge": "^3.490.0",
     "@aws-sdk/lib-dynamodb": "^3.490.0",
     "aws-lambda": "^1.0.7",
     "fast-xml-parser": "^4.3.3",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^3.2.2",
     "nanoid": "^3.3.7",
     "uuid": "^9.0.1"
   },

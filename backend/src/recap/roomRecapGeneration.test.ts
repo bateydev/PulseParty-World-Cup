@@ -4,7 +4,7 @@
 
 import { generateRoomRecap } from './roomRecapGeneration';
 import * as dynamodb from '../utils/dynamodb';
-import { UserScore, Prediction, RoomRecap } from '../types';
+import { UserScore, Prediction } from '../types';
 
 // Mock the dynamodb utilities
 jest.mock('../utils/dynamodb');

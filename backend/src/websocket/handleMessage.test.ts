@@ -2,10 +2,12 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 import { handler } from './handleMessage';
 import * as dynamodb from '../utils/dynamodb';
 import * as roomManagement from '../roomState/roomManagement';
+import * as predictionSubmission from '../momentEngine/predictionSubmission';
 
 // Mock dependencies
 jest.mock('../utils/dynamodb');
 jest.mock('../roomState/roomManagement');
+jest.mock('../momentEngine/predictionSubmission');
 
 const mockGetItem = dynamodb.getItem as jest.MockedFunction<
   typeof dynamodb.getItem
@@ -22,6 +24,7 @@ const mockCreateRoom = roomManagement.createRoom as jest.MockedFunction<
 const mockGetRoomByCode = roomManagement.getRoomByCode as jest.MockedFunction<
   typeof roomManagement.getRoomByCode
 >;
+const mockSubmitPrediction = predictionSubmission.submitPrediction as jest.MockedFunction<typeof predictionSubmission.submitPrediction>;
 
 describe('handleMessage', () => {
   const mockConnectionId = 'test-connection-123';
@@ -46,6 +49,16 @@ describe('handleMessage', () => {
 
     // Default mock for update operations
     mockUpdateItem.mockResolvedValue(null);
+
+    // Default mock for prediction submission
+    mockSubmitPrediction.mockResolvedValue({
+      userId: mockUserId,
+      roomId: mockRoomId,
+      windowId: 'window-123',
+      choice: 'Player A',
+      predictionType: 'next_goal_scorer',
+      submittedAt: new Date().toISOString(),
+    });
   });
 
   const createMockEvent = (body: any): APIGatewayProxyEvent =>
@@ -386,15 +399,12 @@ describe('handleMessage', () => {
       expect(body.type).toBe('predictionSubmitted');
       expect(body.windowId).toBe('window-123');
       expect(body.choice).toBe('Player A');
-      expect(mockPutItem).toHaveBeenCalledWith(
-        expect.objectContaining({
-          Item: expect.objectContaining({
-            PK: `ROOM#${mockRoomId}`,
-            SK: `PREDICTION#window-123#${mockUserId}`,
-            windowId: 'window-123',
-            choice: 'Player A',
-          }),
-        })
+      expect(mockSubmitPrediction).toHaveBeenCalledWith(
+        mockUserId,
+        mockRoomId,
+        'window-123',
+        'Player A',
+        'next_goal_scorer'
       );
     });
 
@@ -444,34 +454,38 @@ describe('handleMessage', () => {
 
   describe('leaveRoom action', () => {
     it('should leave room successfully', async () => {
-      mockGetItem
-        .mockResolvedValueOnce({
-          PK: `CONNECTION#${mockConnectionId}`,
-          SK: 'METADATA',
-          userId: mockUserId,
-          connectedAt: '2024-01-01T00:00:00Z',
-          lastHeartbeat: '2024-01-01T00:00:00Z',
-          messageCount: 0,
-          lastMessageWindow: 0,
-        })
-        .mockResolvedValueOnce({
-          PK: `CONNECTION#${mockConnectionId}`,
-          SK: 'METADATA',
-          userId: mockUserId,
-          roomId: mockRoomId,
-          connectedAt: '2024-01-01T00:00:00Z',
-          lastHeartbeat: '2024-01-01T00:00:00Z',
-        })
-        .mockResolvedValueOnce({
-          PK: `ROOM#${mockRoomId}`,
-          SK: 'METADATA',
-          roomCode: 'ABC123',
-          matchId: 'match-789',
-          theme: 'Country',
-          participants: [mockConnectionId],
-          createdAt: '2024-01-01T00:00:00Z',
-          ttl: 1234567890,
-        });
+      // Mock for rate limiting check
+      mockGetItem.mockResolvedValueOnce({
+        PK: `CONNECTION#${mockConnectionId}`,
+        SK: 'METADATA',
+        userId: mockUserId,
+        connectedAt: '2024-01-01T00:00:00Z',
+        lastHeartbeat: '2024-01-01T00:00:00Z',
+        messageCount: 0,
+        lastMessageWindow: 0,
+      });
+
+      // Mock for handleLeaveRoom connection lookup
+      mockGetItem.mockResolvedValueOnce({
+        PK: `CONNECTION#${mockConnectionId}`,
+        SK: 'METADATA',
+        userId: mockUserId,
+        roomId: mockRoomId,
+        connectedAt: '2024-01-01T00:00:00Z',
+        lastHeartbeat: '2024-01-01T00:00:00Z',
+      });
+
+      // Mock for removeConnectionFromRoom room lookup
+      mockGetItem.mockResolvedValueOnce({
+        PK: `ROOM#${mockRoomId}`,
+        SK: 'METADATA',
+        roomCode: 'ABC123',
+        matchId: 'match-789',
+        theme: 'Country' as const,
+        participants: [mockConnectionId],
+        createdAt: '2024-01-01T00:00:00Z',
+        ttl: 1234567890,
+      });
 
       const event = createMockEvent({
         action: 'leaveRoom',

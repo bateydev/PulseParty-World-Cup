@@ -7,7 +7,12 @@ interface ToastProps {
   duration?: number;
 }
 
-export function Toast({ message, type = 'success', onClose, duration = 3000 }: ToastProps) {
+export function Toast({
+  message,
+  type = 'success',
+  onClose,
+  duration = 3000,
+}: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -30,7 +35,9 @@ export function Toast({ message, type = 'success', onClose, duration = 3000 }: T
 
   return (
     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-slideDown">
-      <div className={`bg-gradient-to-r ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px]`}>
+      <div
+        className={`bg-gradient-to-r ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px]`}
+      >
         <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold">
           {icons[type]}
         </div>

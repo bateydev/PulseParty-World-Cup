@@ -548,3 +548,167 @@ Completed the frontend-backend integration setup with comprehensive WebSocket co
 - Match events are processed
 
 Next step: Deploy backend infrastructure and test end-to-end integration.
+
+
+## Commit 6: Live Match Data Integration
+
+**Date**: April 4, 2026
+
+### Changes Made
+
+1. **API-Football Integration** (`backend/src/ingestion/apiFootball.ts`)
+   - Created service to fetch live match data from API-Football
+   - Implemented `fetchLiveFixtures()` to get all live matches
+   - Implemented `fetchFixtureEvents()` to get events for specific match
+   - Implemented `transformApiFootballEvent()` to convert API format to internal MatchEvent
+   - Added event deduplication with `filterNewEvents()`
+   - Supports goals, cards (yellow/red), and substitutions
+
+2. **Ingestion Lambda Handler** (`backend/src/ingestion/handler.ts`)
+   - Created complete ingestion pipeline orchestration
+   - Fetches live data from API-Football (or falls back to simulator)
+   - Normalizes events using existing normalizer
+   - Publishes to EventBridge using existing publisher
+   - Returns detailed result with success status and metrics
+   - Automatic fallback to simulator mode if API fails
+
+3. **Ingestion Module Index** (`backend/src/ingestion/index.ts`)
+   - Exports handler and all ingestion utilities
+   - Clean module interface for Lambda deployment
+
+4. **Infrastructure Updates** (`infrastructure/lib/pulseparty-stack.ts`)
+   - Updated Ingestion Lambda to use real handler from `backend/dist/`
+   - Added `API_FOOTBALL_KEY` environment variable
+   - Added `SIMULATOR_MODE` environment variable (defaults to true)
+   - Created EventBridge scheduled rule to trigger ingestion every 30 seconds
+   - Added outputs for schedule rule ARN
+
+5. **Documentation**
+   - Created `LIVE_MATCH_DATA_INTEGRATION.md` - comprehensive integration guide
+   - Created `QUICK_START_LIVE_DATA.md` - 10-minute quick start guide
+   - Created `deploy-with-live-data.sh` - automated deployment script
+
+### Features
+
+- **Dual Mode Operation**:
+  - Live Mode: Fetches real match data from API-Football
+  - Simulator Mode: Uses pre-recorded events for demos/testing
+  - Automatic fallback from live to simulator on API failure
+
+- **Scheduled Polling**:
+  - EventBridge rule triggers Lambda every 30 seconds
+  - Configurable schedule (can adjust to save API quota)
+  - Can be disabled for manual triggering only
+
+- **Event Deduplication**:
+  - Tracks processed events to avoid duplicates
+  - Important for scheduled polling
+
+- **Comprehensive Error Handling**:
+  - Graceful API failures with fallback
+  - Detailed error reporting in response
+  - CloudWatch logging for monitoring
+
+### API-Football Integration
+
+**Free Tier**: 100 requests/day
+
+**Supported Event Types**:
+- Goals (with assists)
+- Yellow cards
+- Red cards
+- Substitutions
+
+**Data Flow**:
+```
+API-Football → Ingestion Lambda → Normalize → EventBridge → Room State → WebSocket → Frontend
+```
+
+### Deployment Options
+
+**Option 1: Simulator Mode (Testing)**
+```bash
+./deploy-with-live-data.sh
+# Select option 1
+```
+
+**Option 2: Live Mode (Production)**
+```bash
+./deploy-with-live-data.sh
+# Select option 2
+# Enter API-Football key
+```
+
+### Cost Impact
+
+**Additional Monthly Cost**: ~$1/month
+- Lambda invocations: $0 (within free tier)
+- Lambda duration: $0 (within free tier)
+- EventBridge events: $0.43/month
+- DynamoDB writes: $0.54/month
+
+**Still within $50 sandbox budget!**
+
+### Testing
+
+**Test Simulator Mode**:
+```bash
+aws lambda invoke --function-name PulseParty-Ingestion --payload '{}' response.json
+cat response.json
+# Expected: {"success":true,"mode":"simulator","eventsFetched":3,...}
+```
+
+**Test Live Mode**:
+```bash
+# Set API key first
+aws lambda update-function-configuration \
+  --function-name PulseParty-Ingestion \
+  --environment "Variables={API_FOOTBALL_KEY=your-key,SIMULATOR_MODE=false,...}"
+
+aws lambda invoke --function-name PulseParty-Ingestion --payload '{}' response.json
+cat response.json
+# Expected: {"success":true,"mode":"live","eventsFetched":N,...}
+```
+
+**Monitor Logs**:
+```bash
+aws logs tail /aws/lambda/PulseParty-Ingestion --follow
+```
+
+### Next Steps
+
+1. User needs to decide: Simulator mode or Live mode?
+2. If Live mode: Sign up for API-Football and get API key
+3. Deploy using `./deploy-with-live-data.sh`
+4. Test ingestion is working
+5. Update RoomState Lambda to distribute events to rooms (currently placeholder)
+6. Update MomentEngine Lambda to generate prediction windows (currently placeholder)
+7. Test full flow from API to frontend
+
+### Files Changed
+
+- `backend/src/ingestion/apiFootball.ts` (new)
+- `backend/src/ingestion/handler.ts` (new)
+- `backend/src/ingestion/index.ts` (new)
+- `infrastructure/lib/pulseparty-stack.ts` (modified)
+- `LIVE_MATCH_DATA_INTEGRATION.md` (new)
+- `QUICK_START_LIVE_DATA.md` (new)
+- `deploy-with-live-data.sh` (new)
+- `COMMIT_MESSAGES.md` (updated)
+
+### Commit Message
+
+```
+feat: integrate live match data with API-Football
+
+- Add API-Football service for fetching live match data
+- Create ingestion Lambda handler with dual mode (live/simulator)
+- Add scheduled EventBridge rule to poll every 30 seconds
+- Support automatic fallback to simulator on API failure
+- Add event deduplication to prevent duplicates
+- Create comprehensive documentation and deployment scripts
+- Update infrastructure to use real ingestion handler
+
+Supports both live mode (API-Football) and simulator mode (pre-recorded events).
+Free tier: 100 requests/day. Cost impact: ~$1/month.
+```

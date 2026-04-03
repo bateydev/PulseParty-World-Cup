@@ -16,7 +16,7 @@ export function formatDate(
   options?: Intl.DateTimeFormatOptions
 ): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
@@ -33,12 +33,9 @@ export function formatDate(
  * @param locale - Locale code (en, fr, de, sw)
  * @returns Formatted time string
  */
-export function formatTime(
-  date: string | Date,
-  locale: string = 'en'
-): string {
+export function formatTime(date: string | Date, locale: string = 'en'): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   return new Intl.DateTimeFormat(locale, {
     hour: '2-digit',
     minute: '2-digit',
@@ -56,7 +53,7 @@ export function formatDateTime(
   locale: string = 'en'
 ): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
@@ -203,17 +200,17 @@ export function formatRank(rank: number, locale: string = 'en'): string {
     }
     return `${rank}th`;
   }
-  
+
   // French ordinal
   if (locale === 'fr') {
     return rank === 1 ? `${rank}er` : `${rank}e`;
   }
-  
+
   // German ordinal
   if (locale === 'de') {
     return `${rank}.`;
   }
-  
+
   // Swahili - just the number
   return `${rank}`;
 }

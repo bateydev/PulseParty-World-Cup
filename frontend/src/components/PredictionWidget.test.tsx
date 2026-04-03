@@ -24,7 +24,9 @@ describe('PredictionWidget', () => {
       wsConnected: true,
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
   });
 
   it('should not render when no active prediction window', () => {
@@ -44,7 +46,9 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
@@ -64,13 +68,21 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
-    expect(screen.getByRole('button', { name: 'Player A' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Player B' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Player C' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Player A' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Player B' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Player C' })
+    ).toBeInTheDocument();
   });
 
   it('should highlight selected choice when clicked', () => {
@@ -85,7 +97,9 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
@@ -108,11 +122,15 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
-    const submitButton = screen.getByRole('button', { name: /submit prediction/i });
+    const submitButton = screen.getByRole('button', {
+      name: /submit prediction/i,
+    });
     expect(submitButton).toBeDisabled();
 
     const playerAButton = screen.getByRole('button', { name: 'Player A' });
@@ -133,14 +151,18 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
     const playerAButton = screen.getByRole('button', { name: 'Player A' });
     fireEvent.click(playerAButton);
 
-    const submitButton = screen.getByRole('button', { name: /submit prediction/i });
+    const submitButton = screen.getByRole('button', {
+      name: /submit prediction/i,
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -160,7 +182,9 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
@@ -184,14 +208,18 @@ describe('PredictionWidget', () => {
       createdAt: new Date(Date.now() - 61000).toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
     const playerAButton = screen.getByRole('button', { name: 'Player A' });
     fireEvent.click(playerAButton);
 
-    const submitButton = screen.getByRole('button', { name: /submit prediction/i });
+    const submitButton = screen.getByRole('button', {
+      name: /submit prediction/i,
+    });
     expect(submitButton).toBeDisabled();
   });
 
@@ -208,14 +236,18 @@ describe('PredictionWidget', () => {
     };
     mockStore.wsConnected = false;
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Player A' }));
-    
+
     // Submit button should be disabled when wsConnected is false
-    const submitButton = screen.getByRole('button', { name: /submit prediction/i });
+    const submitButton = screen.getByRole('button', {
+      name: /submit prediction/i,
+    });
     expect(submitButton).toBeDisabled();
   });
 
@@ -231,7 +263,9 @@ describe('PredictionWidget', () => {
       createdAt: new Date().toISOString(),
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     render(<PredictionWidget />);
 
@@ -251,7 +285,9 @@ describe('PredictionWidget', () => {
       createdAt,
     };
 
-    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStore);
+    (useAppStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockStore
+    );
 
     const { container } = render(<PredictionWidget />);
 

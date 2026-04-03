@@ -37,7 +37,10 @@ export const LowBandwidthIndicator: React.FC = () => {
         </svg>
         <span>
           {isAutoDetected
-            ? t('settings.low_bandwidth_auto', 'Low bandwidth detected - reduced data mode active')
+            ? t(
+                'settings.low_bandwidth_auto',
+                'Low bandwidth detected - reduced data mode active'
+              )
             : t('settings.low_bandwidth_manual', 'Low bandwidth mode active')}
         </span>
         <button

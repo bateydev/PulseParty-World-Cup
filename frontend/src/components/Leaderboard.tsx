@@ -59,9 +59,14 @@ export function Leaderboard() {
   const rest = leaderboard.slice(3);
 
   // Reorder for podium display: 2nd, 1st, 3rd
-  const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : 
-                      top3.length === 2 ? [top3[1], top3[0]] :
-                      top3.length === 1 ? [top3[0]] : [];
+  const podiumOrder =
+    top3.length >= 3
+      ? [top3[1], top3[0], top3[2]]
+      : top3.length === 2
+        ? [top3[1], top3[0]]
+        : top3.length === 1
+          ? [top3[0]]
+          : [];
 
   return (
     <div className="leaderboard w-full max-w-4xl mx-auto">
@@ -70,7 +75,9 @@ export function Leaderboard() {
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           🏆 {t('leaderboard.title')}
         </h2>
-        <p className="text-gray-600 dark:text-gray-400">Top performers in this match</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          Top performers in this match
+        </p>
       </div>
 
       {leaderboard.length === 0 ? (
@@ -93,16 +100,22 @@ export function Leaderboard() {
                 {podiumOrder.map((player, index) => {
                   const actualRank = player.rank;
                   const isCurrent = isCurrentUser(player.userId);
-                  
+
                   return (
                     <div
                       key={player.userId}
                       className={`flex flex-col items-center ${
-                        actualRank === 1 ? 'order-2' : actualRank === 2 ? 'order-1' : 'order-3'
+                        actualRank === 1
+                          ? 'order-2'
+                          : actualRank === 2
+                            ? 'order-1'
+                            : 'order-3'
                       }`}
                     >
                       {/* Avatar */}
-                      <div className={`relative ${actualRank === 1 ? 'mb-2' : ''}`}>
+                      <div
+                        className={`relative ${actualRank === 1 ? 'mb-2' : ''}`}
+                      >
                         <div
                           className={`w-20 h-20 rounded-full bg-gradient-to-br ${getAvatarColor(
                             actualRank
@@ -115,23 +128,33 @@ export function Leaderboard() {
                         {/* Rank badge */}
                         <div className="absolute -top-2 -right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg border-2 border-gray-200 dark:border-gray-700">
                           <span className="text-lg">
-                            {actualRank === 1 ? '🥇' : actualRank === 2 ? '🥈' : '🥉'}
+                            {actualRank === 1
+                              ? '🥇'
+                              : actualRank === 2
+                                ? '🥈'
+                                : '🥉'}
                           </span>
                         </div>
                       </div>
 
                       {/* Name */}
-                      <p className={`font-bold text-gray-900 dark:text-white text-center mt-2 ${
-                        actualRank === 1 ? 'text-lg' : 'text-sm'
-                      }`}>
+                      <p
+                        className={`font-bold text-gray-900 dark:text-white text-center mt-2 ${
+                          actualRank === 1 ? 'text-lg' : 'text-sm'
+                        }`}
+                      >
                         {player.displayName}
-                        {isCurrent && <span className="text-blue-500"> (You)</span>}
+                        {isCurrent && (
+                          <span className="text-blue-500"> (You)</span>
+                        )}
                       </p>
 
                       {/* Points */}
-                      <p className={`font-bold text-yellow-600 dark:text-yellow-400 ${
-                        actualRank === 1 ? 'text-2xl' : 'text-lg'
-                      }`}>
+                      <p
+                        className={`font-bold text-yellow-600 dark:text-yellow-400 ${
+                          actualRank === 1 ? 'text-2xl' : 'text-lg'
+                        }`}
+                      >
                         {formatPoints(player.totalPoints, locale)}
                       </p>
                     </div>
@@ -156,7 +179,11 @@ export function Leaderboard() {
                       className={`flex-1 max-w-[120px] bg-gradient-to-t ${
                         colors[actualRank as keyof typeof colors]
                       } ${heights[actualRank as keyof typeof heights]} rounded-t-2xl shadow-xl flex flex-col items-center justify-center text-white font-bold ${
-                        actualRank === 1 ? 'order-2' : actualRank === 2 ? 'order-1' : 'order-3'
+                        actualRank === 1
+                          ? 'order-2'
+                          : actualRank === 2
+                            ? 'order-1'
+                            : 'order-3'
                       }`}
                     >
                       <div className="text-4xl mb-1">{actualRank}</div>
@@ -220,7 +247,9 @@ export function Leaderboard() {
                         <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
                           {formatPoints(entry.totalPoints, locale)}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">points</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          points
+                        </p>
                       </div>
                     </div>
                   );

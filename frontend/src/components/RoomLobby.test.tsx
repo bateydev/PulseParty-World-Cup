@@ -56,18 +56,35 @@ describe('RoomLobby', () => {
       render(<RoomLobby />);
 
       expect(screen.getByText('PulseParty Rooms')).toBeInTheDocument();
-      expect(screen.getByText('Live match experience with friends')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Create Room' })).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: 'Join Room' })).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: 'Discover Rooms' })).toBeInTheDocument();
+      expect(
+        screen.getByText('Live match experience with friends')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Create Room' })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Join Room' })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Discover Rooms' })
+      ).toBeInTheDocument();
     });
 
     it('should render theme selection buttons', () => {
       render(<RoomLobby />);
 
-      const countryButton = screen.getByRole('button', { name: 'Country', pressed: true });
-      const clubButton = screen.getByRole('button', { name: 'Club', pressed: false });
-      const privateButton = screen.getByRole('button', { name: 'Private', pressed: false });
+      const countryButton = screen.getByRole('button', {
+        name: 'Country',
+        pressed: true,
+      });
+      const clubButton = screen.getByRole('button', {
+        name: 'Club',
+        pressed: false,
+      });
+      const privateButton = screen.getByRole('button', {
+        name: 'Private',
+        pressed: false,
+      });
 
       expect(countryButton).toBeInTheDocument();
       expect(clubButton).toBeInTheDocument();
@@ -124,7 +141,10 @@ describe('RoomLobby', () => {
       fireEvent.click(createButton);
 
       await waitFor(() => {
-        expect(mockCreateRoom).toHaveBeenCalledWith('Country', 'match-demo-001');
+        expect(mockCreateRoom).toHaveBeenCalledWith(
+          'Country',
+          'match-demo-001'
+        );
       });
     });
 
@@ -155,7 +175,9 @@ describe('RoomLobby', () => {
 
       // Check that button shows loading state
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Loading...' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'Loading...' })
+        ).toBeInTheDocument();
       });
 
       // Resolve the promise
@@ -236,7 +258,9 @@ describe('RoomLobby', () => {
     });
 
     it('should display error message when room join fails', async () => {
-      mockJoinRoom.mockRejectedValue(new Error('Room not found. Check the code and try again.'));
+      mockJoinRoom.mockRejectedValue(
+        new Error('Room not found. Check the code and try again.')
+      );
 
       render(<RoomLobby />);
 
@@ -248,7 +272,9 @@ describe('RoomLobby', () => {
       fireEvent.click(mainJoinButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Room not found. Check the code and try again.')).toBeInTheDocument();
+        expect(
+          screen.getByText('Room not found. Check the code and try again.')
+        ).toBeInTheDocument();
       });
     });
   });
@@ -296,7 +322,7 @@ describe('RoomLobby', () => {
       const allButtons = screen.getAllByRole('button', { name: 'Join Room' });
       // The first button is the main join button, the rest are in the public rooms list
       const firstPublicRoomJoinButton = allButtons[1];
-      
+
       fireEvent.click(firstPublicRoomJoinButton);
 
       await waitFor(() => {

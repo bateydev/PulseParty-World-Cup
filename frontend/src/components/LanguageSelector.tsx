@@ -11,7 +11,8 @@ export function LanguageSelector() {
     { code: 'sw', flag: '🇹🇿', name: 'SW' },
   ];
 
-  const currentLang = languages.find((lang) => lang.code === i18n.language) || languages[0];
+  const currentLang =
+    languages.find((lang) => lang.code === i18n.language) || languages[0];
 
   return (
     <div className="relative group">
@@ -37,7 +38,9 @@ export function LanguageSelector() {
             <span className="text-xl">{lang.flag}</span>
             <span className="text-sm font-semibold">{lang.name}</span>
             {i18n.language === lang.code && (
-              <span className="ml-auto text-blue-600 dark:text-blue-400">✓</span>
+              <span className="ml-auto text-blue-600 dark:text-blue-400">
+                ✓
+              </span>
             )}
           </button>
         ))}

@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
 import { Toast } from './Toast';
-import { formatPercentage, formatPoints, formatDateTime } from '../utils/formatters';
+import {
+  formatPercentage,
+  formatPoints,
+  formatDateTime,
+} from '../utils/formatters';
 
 /**
  * WrappedRecapView Component
@@ -40,7 +44,7 @@ export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
   const [animationPhase, setAnimationPhase] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  
+
   // Get current locale
   const locale = i18n.language;
 
@@ -154,12 +158,8 @@ export function WrappedRecapView({ recap, onClose }: WrappedRecapViewProps) {
           <div className="text-6xl mb-4 animate-bounce">
             {recap.finalRank === 1 ? '👑' : recap.finalRank <= 3 ? '🎉' : '⚽'}
           </div>
-          <h2 className="text-4xl font-bold mb-2">
-            {t('recap.title')}
-          </h2>
-          <p className="text-xl opacity-90 mb-4">
-            {getPerformanceMessage()}
-          </p>
+          <h2 className="text-4xl font-bold mb-2">{t('recap.title')}</h2>
+          <p className="text-xl opacity-90 mb-4">{getPerformanceMessage()}</p>
           <div className="inline-block bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full">
             <p className="font-semibold">
               {user?.displayName || t('common.guest')}

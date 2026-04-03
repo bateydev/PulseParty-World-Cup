@@ -39,7 +39,7 @@ function getConnection(): NetworkInformation | null {
  */
 function isSlowConnection(): boolean {
   const connection = getConnection();
-  
+
   if (!connection) {
     return false;
   }
@@ -50,7 +50,10 @@ function isSlowConnection(): boolean {
   }
 
   // Check effective connection type
-  if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+  if (
+    connection.effectiveType === 'slow-2g' ||
+    connection.effectiveType === '2g'
+  ) {
     return true;
   }
 

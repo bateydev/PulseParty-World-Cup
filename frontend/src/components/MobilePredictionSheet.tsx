@@ -9,7 +9,10 @@ export function MobilePredictionSheet() {
 
   // Auto-expand when new prediction appears
   useEffect(() => {
-    if (activePredictionWindow && activePredictionWindow.windowId !== lastWindowId) {
+    if (
+      activePredictionWindow &&
+      activePredictionWindow.windowId !== lastWindowId
+    ) {
       setLastWindowId(activePredictionWindow.windowId);
       // Auto-open sheet for new predictions
       if (lastWindowId !== null) {
@@ -41,11 +44,11 @@ export function MobilePredictionSheet() {
       {isExpanded && (
         <div className="fixed inset-0 z-50 flex items-end animate-fadeIn">
           {/* Backdrop - No blur, just slight darkening */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/20"
             onClick={() => setIsExpanded(false)}
           ></div>
-          
+
           {/* Sheet Content - Max 50% height */}
           <div className="relative w-full bg-white dark:bg-gray-900 rounded-t-3xl shadow-2xl animate-slideUp max-h-[50vh] overflow-y-auto">
             {/* Handle Bar */}

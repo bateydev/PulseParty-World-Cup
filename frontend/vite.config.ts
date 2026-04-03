@@ -100,4 +100,8 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
+  define: {
+    // Polyfill for Cognito SDK
+    global: 'globalThis',
+  },
 });

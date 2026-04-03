@@ -156,16 +156,20 @@ export function loadDemoData(store: any) {
   let predictionCount = 1;
   setInterval(() => {
     predictionCount++;
-    
+
     const predictionTypes = [
-      { type: 'next_goal_scorer', options: ['Müller', 'Haaland', 'Sané', 'Reus', 'No Goal'] },
+      {
+        type: 'next_goal_scorer',
+        options: ['Müller', 'Haaland', 'Sané', 'Reus', 'No Goal'],
+      },
       { type: 'next_card', options: ['Yellow Card', 'Red Card', 'No Card'] },
       { type: 'next_corner', options: ['Home Team', 'Away Team', 'No Corner'] },
       { type: 'half_time_score', options: ['Home Win', 'Draw', 'Away Win'] },
     ];
-    
-    const randomPrediction = predictionTypes[Math.floor(Math.random() * predictionTypes.length)];
-    
+
+    const randomPrediction =
+      predictionTypes[Math.floor(Math.random() * predictionTypes.length)];
+
     const newPredictionWindow = {
       windowId: `window-${predictionCount}`,
       roomId: 'room-123',
@@ -175,7 +179,7 @@ export function loadDemoData(store: any) {
       expiresAt: new Date(Date.now() + 60000).toISOString(), // 1 minute to predict
       createdAt: new Date().toISOString(),
     };
-    
+
     console.log('🎯 New prediction window:', randomPrediction.type);
     store.setActivePredictionWindow(newPredictionWindow);
   }, 120000); // Every 2 minutes

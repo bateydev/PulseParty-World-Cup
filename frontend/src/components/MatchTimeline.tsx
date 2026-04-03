@@ -53,7 +53,10 @@ export function MatchTimeline() {
     if (timelineEndRef.current && matchEvents.length > 0) {
       // Check if scrollIntoView is available (not available in test environment)
       if (typeof timelineEndRef.current.scrollIntoView === 'function') {
-        timelineEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        timelineEndRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+        });
       }
     }
   }, [matchEvents]);
@@ -64,7 +67,7 @@ export function MatchTimeline() {
   };
 
   // Get localized event description
-  const getEventDescription = (event: typeof matchEvents[0]): string => {
+  const getEventDescription = (event: (typeof matchEvents)[0]): string => {
     const { eventType, metadata } = event;
 
     // Extract common metadata fields
@@ -115,7 +118,9 @@ export function MatchTimeline() {
     <div className="match-timeline w-full max-w-2xl mx-auto">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('match.timeline')}</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          {t('match.timeline')}
+        </h2>
       </div>
 
       {/* Timeline Container */}
@@ -131,11 +136,12 @@ export function MatchTimeline() {
               <div
                 key={event.eventId}
                 className={`event-card p-4 rounded-xl border-2 transition-all hover:shadow-md bg-white dark:bg-gray-700 ${
-                  event.eventType === 'goal' 
-                    ? 'border-green-400 dark:border-green-500' 
-                    : event.eventType === 'yellow_card' || event.eventType === 'red_card'
-                    ? 'border-yellow-400 dark:border-yellow-500'
-                    : 'border-gray-200 dark:border-gray-600'
+                  event.eventType === 'goal'
+                    ? 'border-green-400 dark:border-green-500'
+                    : event.eventType === 'yellow_card' ||
+                        event.eventType === 'red_card'
+                      ? 'border-yellow-400 dark:border-yellow-500'
+                      : 'border-gray-200 dark:border-gray-600'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -157,7 +163,9 @@ export function MatchTimeline() {
                     </div>
 
                     {/* Event Description */}
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{getEventDescription(event)}</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {getEventDescription(event)}
+                    </p>
                   </div>
                 </div>
               </div>

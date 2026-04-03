@@ -3,42 +3,110 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
 
 interface RoomLobbyProps {
-  onJoinRoom: (matchInfo?: { match: string; code: string; theme: string; matchId: string }) => void;
+  onJoinRoom: (matchInfo?: {
+    match: string;
+    code: string;
+    theme: string;
+    matchId: string;
+  }) => void;
 }
 
 export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
   const { t } = useTranslation();
-  const [selectedTheme, setSelectedTheme] = useState<'Country' | 'Club' | 'Private' | null>(null);
-  const [selectedMatch, setSelectedMatch] = useState<{ id: string; name: string } | null>(null);
+  const { createRoom, joinRoom, wsConnected } = useAppStore();
+  const [selectedTheme, setSelectedTheme] = useState<
+    'Country' | 'Club' | 'Private' | null
+  >(null);
+  const [selectedMatch, setSelectedMatch] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [roomCode, setRoomCode] = useState('');
-  const [activeTab, setActiveTab] = useState<'create' | 'join' | 'discover'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState({ title: '', message: '', emoji: '' });
+  const [modalContent, setModalContent] = useState({
+    title: '',
+    message: '',
+    emoji: '',
+  });
+  const [isCreating, setIsCreating] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const themes = [
-    { value: 'Country', icon: '🌍', color: 'from-green-500 to-emerald-600', label: t('room.theme_country') },
-    { value: 'Club', icon: '⚽', color: 'from-blue-500 to-cyan-600', label: t('room.theme_club') },
-    { value: 'Private', icon: '🔒', color: 'from-purple-500 to-pink-600', label: t('room.theme_private') },
+    {
+      value: 'Country',
+      icon: '🌍',
+      color: 'from-green-500 to-emerald-600',
+      label: t('room.theme_country'),
+    },
+    {
+      value: 'Club',
+      icon: '⚽',
+      color: 'from-blue-500 to-cyan-600',
+      label: t('room.theme_club'),
+    },
+    {
+      value: 'Private',
+      icon: '🔒',
+      color: 'from-purple-500 to-pink-600',
+      label: t('room.theme_private'),
+    },
   ];
 
   // Available matches by theme
   // Match IDs align with backend matchId format
   const matchesByTheme = {
     Country: [
-      { id: 'match-country-1', name: 'Germany vs France', league: 'UEFA Nations League' },
-      { id: 'match-country-2', name: 'Brazil vs Argentina', league: 'CONMEBOL' },
-      { id: 'match-country-3', name: 'England vs Spain', league: 'International Friendly' },
-      { id: 'match-country-4', name: 'Portugal vs Italy', league: 'UEFA Nations League' },
+      {
+        id: 'match-country-1',
+        name: 'Germany vs France',
+        league: 'UEFA Nations League',
+      },
+      {
+        id: 'match-country-2',
+        name: 'Brazil vs Argentina',
+        league: 'CONMEBOL',
+      },
+      {
+        id: 'match-country-3',
+        name: 'England vs Spain',
+        league: 'International Friendly',
+      },
+      {
+        id: 'match-country-4',
+        name: 'Portugal vs Italy',
+        league: 'UEFA Nations League',
+      },
     ],
     Club: [
-      { id: 'match-club-1', name: 'Bayern Munich vs Borussia Dortmund', league: 'Bundesliga' },
-      { id: 'match-club-2', name: 'Real Madrid vs Barcelona', league: 'La Liga' },
-      { id: 'match-club-3', name: 'Manchester City vs Liverpool', league: 'Premier League' },
+      {
+        id: 'match-club-1',
+        name: 'Bayern Munich vs Borussia Dortmund',
+        league: 'Bundesliga',
+      },
+      {
+        id: 'match-club-2',
+        name: 'Real Madrid vs Barcelona',
+        league: 'La Liga',
+      },
+      {
+        id: 'match-club-3',
+        name: 'Manchester City vs Liverpool',
+        league: 'Premier League',
+      },
       { id: 'match-club-4', name: 'PSG vs Marseille', league: 'Ligue 1' },
     ],
     Private: [
-      { id: 'match-private-1', name: 'Custom Match 1', league: 'Private League' },
-      { id: 'match-private-2', name: 'Custom Match 2', league: 'Private League' },
+      {
+        id: 'match-private-1',
+        name: 'Custom Match 1',
+        league: 'Private League',
+      },
+      {
+        id: 'match-private-2',
+        name: 'Custom Match 2',
+        league: 'Private League',
+      },
     ],
   };
 
@@ -48,120 +116,121 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
     return matchesByTheme[selectedTheme];
   };
 
-  const mockRooms = [
-    { code: 'BAYMUN', matchId: 'match-club-1', match: 'Bayern Munich vs Borussia Dortmund', players: 12, theme: 'Club', homeTeam: 'Bayern Munich', awayTeam: 'Borussia Dortmund' },
-    { code: 'GERFRA', matchId: 'match-country-1', match: 'Germany vs France', players: 8, theme: 'Country', homeTeam: 'Germany', awayTeam: 'France' },
-    { code: 'LIVE01', matchId: 'match-club-2', match: 'Real Madrid vs Barcelona', players: 15, theme: 'Club', homeTeam: 'Real Madrid', awayTeam: 'Barcelona' },
-  ];
+  // Button handlers with real WebSocket integration
+  const handleCreateRoom = async () => {
+    if (!selectedMatch || !wsConnected || isCreating) return;
 
-  // Generate a random room code (6 characters to match backend format)
-  // Backend uses format: ABCDEF (no dash, 6 chars)
-  const generateRoomCode = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude similar chars (I/1, O/0)
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return code;
-  };
+    setIsCreating(true);
 
-  // Button handlers with feedback
-  const handleCreateRoom = () => {
-    if (!selectedMatch) return;
-    
-    const generatedCode = generateRoomCode();
-    console.log('Creating room with:', {
-      theme: selectedTheme,
-      matchId: selectedMatch.id,
-      matchName: selectedMatch.name,
-      roomCode: generatedCode
-    });
-    
-    // TODO: When connecting to backend, send WebSocket message:
-    // {
-    //   action: 'createRoom',
-    //   payload: {
-    //     matchId: selectedMatch.id,
-    //     theme: selectedTheme
-    //   }
-    // }
-    // Backend will return the actual room code
-    
-    setModalContent({
-      emoji: '🎮',
-      title: 'Room Created!',
-      message: `Your ${selectedTheme} room code is:\n\n${generatedCode}\n\nShare this code with friends to join!`
-    });
-    setShowModal(true);
-    
-    // Navigate to match after 3 seconds (more time to see code)
-    setTimeout(() => {
-      setShowModal(false);
-      onJoinRoom({ 
-        match: selectedMatch.name, 
-        code: generatedCode, 
-        theme: selectedTheme!,
-        matchId: selectedMatch.id 
+    try {
+      console.log('Creating room with:', {
+        theme: selectedTheme,
+        matchId: selectedMatch.id,
+        matchName: selectedMatch.name,
       });
-    }, 3000);
+
+      // Call the store's createRoom method which sends WebSocket message
+      const roomCode = await createRoom(selectedTheme!, selectedMatch.id);
+
+      setModalContent({
+        emoji: '🎮',
+        title: 'Room Created!',
+        message: `Your ${selectedTheme} room code is:\n\n${roomCode}\n\nShare this code with friends to join!`,
+      });
+      setShowModal(true);
+
+      // Navigate to match after 3 seconds (more time to see code)
+      setTimeout(() => {
+        setShowModal(false);
+        onJoinRoom({
+          match: selectedMatch.name,
+          code: roomCode,
+          theme: selectedTheme!,
+          matchId: selectedMatch.id,
+        });
+        setIsCreating(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to create room:', error);
+      setModalContent({
+        emoji: '❌',
+        title: 'Error',
+        message: `Failed to create room: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+      setShowModal(true);
+      setTimeout(() => {
+        setShowModal(false);
+        setIsCreating(false);
+      }, 2000);
+    }
   };
 
-  const handleJoinRoom = () => {
-    console.log('Joining room with code:', roomCode);
-    
-    // TODO: When connecting to backend, send WebSocket message:
-    // {
-    //   action: 'joinRoom',
-    //   payload: {
-    //     roomCode: roomCode
-    //   }
-    // }
-    // Backend will return room details (matchId, theme, etc.)
-    
-    setModalContent({
-      emoji: '🚪',
-      title: 'Joining Room',
-      message: `Connecting to room ${roomCode}...`
-    });
-    setShowModal(true);
-    
-    // Navigate to match after 1.5 seconds
-    setTimeout(() => {
-      setShowModal(false);
-      onJoinRoom({ match: 'Live Match', code: roomCode, theme: 'Club', matchId: 'match-unknown' });
-    }, 1500);
-  };
+  const handleJoinRoom = async () => {
+    if (!wsConnected || isJoining || roomCode.length < 3) return;
 
-  const handleJoinDiscoveredRoom = (room: any) => {
-    console.log('Joining discovered room:', room);
-    
-    // TODO: When connecting to backend, send WebSocket message:
-    // {
-    //   action: 'joinRoom',
-    //   payload: {
-    //     roomCode: room.code
-    //   }
-    // }
-    
-    setModalContent({
-      emoji: '⚽',
-      title: room.match,
-      message: `Joining ${room.players} fans watching live...\n\n${room.homeTeam} vs ${room.awayTeam}`
-    });
-    setShowModal(true);
-    
-    // Navigate to match after 2 seconds
-    setTimeout(() => {
-      setShowModal(false);
-      onJoinRoom({ match: room.match, code: room.code, theme: room.theme, matchId: room.matchId || 'match-unknown' });
-    }, 2000);
+    setIsJoining(true);
+
+    try {
+      console.log('Joining room with code:', roomCode);
+
+      setModalContent({
+        emoji: '🚪',
+        title: 'Joining Room',
+        message: `Connecting to room ${roomCode}...`,
+      });
+      setShowModal(true);
+
+      // Call the store's joinRoom method which sends WebSocket message
+      await joinRoom(roomCode);
+
+      // Navigate to match after successful join
+      setTimeout(() => {
+        setShowModal(false);
+        onJoinRoom({
+          match: 'Live Match',
+          code: roomCode,
+          theme: 'Club',
+          matchId: 'match-unknown',
+        });
+        setIsJoining(false);
+      }, 1500);
+    } catch (error) {
+      console.error('Failed to join room:', error);
+      setModalContent({
+        emoji: '❌',
+        title: 'Error',
+        message: `Failed to join room: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+      setShowModal(true);
+      setTimeout(() => {
+        setShowModal(false);
+        setIsJoining(false);
+      }, 2000);
+    }
   };
 
   return (
     <div className="space-y-4 animate-fadeIn">
+      {/* Connection Status Warning */}
+      {!wsConnected && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4">
+          <div className="flex items-start space-x-3">
+            <span className="text-2xl">⚠️</span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                Connecting to server...
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Please wait while we establish a connection to the backend.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab Selector */}
-      <div className="grid grid-cols-3 gap-2 p-1 bg-gray-200 dark:bg-gray-800 rounded-2xl">
-        {['create', 'join', 'discover'].map((tab) => (
+      <div className="grid grid-cols-2 gap-2 p-1 bg-gray-200 dark:bg-gray-800 rounded-2xl">
+        {['create', 'join'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
@@ -173,7 +242,6 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
           >
             {tab === 'create' && '➕ Create'}
             {tab === 'join' && '🚪 Join'}
-            {tab === 'discover' && '🔍 Discover'}
           </button>
         ))}
       </div>
@@ -190,7 +258,7 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Select a theme to see available matches
               </p>
-              
+
               <div className="grid grid-cols-1 gap-3">
                 {themes.map((theme) => (
                   <button
@@ -198,14 +266,18 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
                     onClick={() => setSelectedTheme(theme.value as any)}
                     className="relative overflow-hidden rounded-2xl p-6 transition-all transform hover:scale-102 active:scale-98"
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${theme.color} opacity-90`}></div>
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${theme.color} opacity-90`}
+                    ></div>
                     <div className="relative flex items-center justify-between text-white">
                       <div className="flex items-center space-x-4">
                         <span className="text-4xl">{theme.icon}</span>
                         <div className="text-left">
                           <p className="font-bold text-lg">{theme.label}</p>
                           <p className="text-sm opacity-90">
-                            {theme.value === 'Private' ? 'Invite only' : 'Public room'}
+                            {theme.value === 'Private'
+                              ? 'Invite only'
+                              : 'Public room'}
                           </p>
                         </div>
                       </div>
@@ -236,7 +308,7 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
                   ← Change Theme
                 </button>
               </div>
-              
+
               <div className="space-y-3">
                 {getFilteredMatches().map((match) => (
                   <button
@@ -246,8 +318,12 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <p className="font-bold text-gray-900 dark:text-white">{match.name}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{match.league}</p>
+                        <p className="font-bold text-gray-900 dark:text-white">
+                          {match.name}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          {match.league}
+                        </p>
                       </div>
                       <span className="text-2xl">⚽</span>
                     </div>
@@ -263,19 +339,29 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
               <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
                 Ready to Create Room
               </h3>
-              
+
               {/* Summary */}
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-4 mb-4">
                 <div className="flex items-start gap-3">
                   <div className="text-3xl">
-                    {themes.find(t => t.value === selectedTheme)?.icon}
+                    {themes.find((t) => t.value === selectedTheme)?.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Theme</p>
-                    <p className="font-bold text-gray-900 dark:text-white">{selectedTheme}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Match</p>
-                    <p className="font-bold text-gray-900 dark:text-white">{selectedMatch.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">ID: {selectedMatch.id}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Theme
+                    </p>
+                    <p className="font-bold text-gray-900 dark:text-white">
+                      {selectedTheme}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      Match
+                    </p>
+                    <p className="font-bold text-gray-900 dark:text-white">
+                      {selectedMatch.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      ID: {selectedMatch.id}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -289,11 +375,12 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
                 >
                   ← Back
                 </button>
-                <button 
+                <button
                   onClick={handleCreateRoom}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all"
+                  disabled={!wsConnected || isCreating}
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  🎮 Create Room
+                  {isCreating ? '⏳ Creating...' : '🎮 Create Room'}
                 </button>
               </div>
             </div>
@@ -310,7 +397,11 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
               <span className="text-2xl">💡</span>
               <div className="flex-1">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <span className="font-semibold">Get a room code from a friend</span> who created a room, or create your own room to get a code to share!
+                  <span className="font-semibold">
+                    Get a room code from a friend
+                  </span>{' '}
+                  who created a room, or create your own room to get a code to
+                  share!
                 </p>
               </div>
             </div>
@@ -320,7 +411,7 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
             <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
               Enter Room Code
             </h3>
-            
+
             <input
               type="text"
               value={roomCode}
@@ -330,51 +421,16 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
               maxLength={6}
             />
 
-            <button 
+            <button
               onClick={handleJoinRoom}
               className="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transform hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={roomCode.length < 3}
+              disabled={roomCode.length < 3 || !wsConnected || isJoining}
             >
-              <span className="text-lg">🚪 Join Room</span>
+              <span className="text-lg">
+                {isJoining ? '⏳ Joining...' : '🚪 Join Room'}
+              </span>
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Discover Rooms */}
-      {activeTab === 'discover' && (
-        <div className="space-y-3">
-          {mockRooms.map((room, index) => (
-            <div
-              key={index}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-lg border border-gray-200 dark:border-gray-700 transform hover:scale-102 active:scale-98 transition-all cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-                      🔴 LIVE
-                    </span>
-                    <span className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold rounded-full">
-                      {room.theme}
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-gray-900 dark:text-white mb-1">
-                    {room.match}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    👥 {room.players} watching • Code: {room.code}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => handleJoinDiscoveredRoom(room)}
-                  className="ml-4 bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-110 active:scale-95 transition-all"
-                >
-                  Join
-                </button>
-              </div>
-            </div>
-          ))}
         </div>
       )}
 
@@ -383,18 +439,20 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-          
+
           {/* Modal Content */}
           <div className="relative bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl max-w-sm w-full transform animate-scaleIn border-2 border-gray-200 dark:border-gray-700">
             <div className="text-center">
-              <div className="text-6xl mb-4 animate-bounce">{modalContent.emoji}</div>
+              <div className="text-6xl mb-4 animate-bounce">
+                {modalContent.emoji}
+              </div>
               <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
                 {modalContent.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-line">
                 {modalContent.message}
               </p>
-              
+
               {/* Loading Spinner */}
               <div className="flex justify-center">
                 <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>

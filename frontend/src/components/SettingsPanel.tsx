@@ -57,7 +57,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           }`}
         >
           <div className="flex items-center justify-between">
-            <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <h2
+              className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
+            >
               {t('settings.title', 'Settings')}
             </h2>
             <button
@@ -68,7 +70,12 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   : 'hover:bg-gray-100 text-gray-600'
               }`}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -101,10 +108,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{isDark ? '🌙' : '☀️'}</span>
                 <div>
-                  <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <p
+                    className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
                     {t('settings.dark_mode', 'Dark Mode')}
                   </p>
-                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <p
+                    className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     {isDark
                       ? t('settings.dark_mode_on', 'Easier on the eyes')
                       : t('settings.dark_mode_off', 'Bright and clear')}
@@ -152,8 +163,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         ? 'bg-blue-600 text-white'
                         : 'bg-blue-500 text-white'
                       : isDark
-                      ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <div className="text-2xl mb-1">{lang.flag}</div>
@@ -183,10 +194,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 <div className="flex items-start gap-3 flex-1">
                   <span className="text-2xl">⚡</span>
                   <div>
-                    <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <p
+                      className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+                    >
                       {t('settings.low_bandwidth_mode', 'Low Bandwidth Mode')}
                     </p>
-                    <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <p
+                      className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                    >
                       {t(
                         'settings.low_bandwidth_desc',
                         'Reduces data usage by limiting update frequency and media quality'
@@ -197,7 +212,11 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 <button
                   onClick={toggle}
                   className={`relative w-14 h-8 rounded-full transition-colors flex-shrink-0 ${
-                    isEnabled ? 'bg-orange-600' : isDark ? 'bg-gray-700' : 'bg-gray-300'
+                    isEnabled
+                      ? 'bg-orange-600'
+                      : isDark
+                        ? 'bg-gray-700'
+                        : 'bg-gray-300'
                   }`}
                 >
                   <div
@@ -218,21 +237,44 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   }`}
                 >
                   <span className="font-medium">
-                    {t('settings.auto_detected', 'Auto-detected: Slow connection')}
+                    {t(
+                      'settings.auto_detected',
+                      'Auto-detected: Slow connection'
+                    )}
                   </span>
                 </div>
               )}
 
               {/* What's affected */}
               {isEnabled && (
-                <div className={`mt-3 text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div
+                  className={`mt-3 text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                >
                   <p className="font-medium mb-1">
                     {t('settings.low_bandwidth_affects', 'What changes:')}
                   </p>
                   <ul className="space-y-1 ml-4">
-                    <li>• {t('settings.reduced_updates', 'Reduced real-time update frequency')}</li>
-                    <li>• {t('settings.essential_events', 'Only essential match events')}</li>
-                    <li>• {t('settings.compressed_data', 'Compressed data transmission')}</li>
+                    <li>
+                      •{' '}
+                      {t(
+                        'settings.reduced_updates',
+                        'Reduced real-time update frequency'
+                      )}
+                    </li>
+                    <li>
+                      •{' '}
+                      {t(
+                        'settings.essential_events',
+                        'Only essential match events'
+                      )}
+                    </li>
+                    <li>
+                      •{' '}
+                      {t(
+                        'settings.compressed_data',
+                        'Compressed data transmission'
+                      )}
+                    </li>
                   </ul>
                 </div>
               )}
@@ -259,15 +301,21 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   <span className="text-2xl">⚽</span>
                 </div>
                 <div>
-                  <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <p
+                    className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                  >
                     PulseParty Rooms
                   </p>
-                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <p
+                    className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     Version 1.0.0
                   </p>
                 </div>
               </div>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p
+                className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+              >
                 {t(
                   'settings.about_desc',
                   'Real-time social multiplayer fan experience for live football matches'

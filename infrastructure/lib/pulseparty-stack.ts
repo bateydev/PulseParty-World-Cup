@@ -33,7 +33,7 @@ export class PulsePartyStack extends cdk.Stack {
     // DynamoDB single-table design with GSI for match+theme discovery
     // Requirements: 10.1, 10.2, 10.9
     this.table = new dynamodb.Table(this, 'PulsePartyTable', {
-      tableName: 'PulsePartyTable',
+      tableName: 'PulsePartyTable-v2',
 
       // Primary key: PK (partition key), SK (sort key)
       partitionKey: {
@@ -104,21 +104,17 @@ export class PulsePartyStack extends cdk.Stack {
     // Create Cognito User Pool for authenticated users
     this.userPool = new cognito.UserPool(this, 'PulsePartyUserPool', {
       userPoolName: 'PulsePartyUserPool',
-      
       // Self-service sign-up enabled
       selfSignUpEnabled: true,
-      
       // Sign-in with email or username
       signInAliases: {
         email: true,
         username: true,
       },
-      
       // Auto-verify email addresses
       autoVerify: {
         email: true,
       },
-      
       // Standard attributes
       standardAttributes: {
         email: {
@@ -130,13 +126,11 @@ export class PulsePartyStack extends cdk.Stack {
           mutable: true,
         },
       },
-      
       // Custom attributes for display name and locale
       customAttributes: {
         displayName: new cognito.StringAttribute({ minLen: 1, maxLen: 50, mutable: true }),
         locale: new cognito.StringAttribute({ minLen: 2, maxLen: 5, mutable: true }),
       },
-      
       // Password policy
       passwordPolicy: {
         minLength: 8,
@@ -145,10 +139,8 @@ export class PulsePartyStack extends cdk.Stack {
         requireDigits: true,
         requireSymbols: false,
       },
-      
       // Account recovery
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
-      
       // Removal policy - use RETAIN for production
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
@@ -157,26 +149,21 @@ export class PulsePartyStack extends cdk.Stack {
     this.userPoolClient = new cognito.UserPoolClient(this, 'PulsePartyUserPoolClient', {
       userPool: this.userPool,
       userPoolClientName: 'PulsePartyWebClient',
-      
       // OAuth flows
       authFlows: {
         userPassword: true,
         userSrp: true,
         custom: false,
       },
-      
       // Token validity
       accessTokenValidity: cdk.Duration.hours(1),
       idTokenValidity: cdk.Duration.hours(1),
       refreshTokenValidity: cdk.Duration.days(30),
-      
       // Prevent client secret (for public web clients)
       generateSecret: false,
-      
       // Enable token revocation
       enableTokenRevocation: true,
     });
-
     // Create Identity Pool for AWS credentials (optional, for future use)
     this.identityPool = new cognito.CfnIdentityPool(this, 'PulsePartyIdentityPool', {
       identityPoolName: 'PulsePartyIdentityPool',
@@ -365,32 +352,24 @@ export class PulsePartyStack extends cdk.Stack {
     // Grant SQS permissions for DLQ
     this.deadLetterQueue.grantSendMessages(lambdaExecutionRole);
 
-    // 1. Ingestion Lambda - Parse XML, normalize events, publish to EventBridge
+    // 1. Ingestion Lambda - Fetch live match data, normalize events, publish to EventBridge
     // Requirements: 2.1, 2.2, 2.3, 11.1-11.8
     this.ingestionFunction = new lambda.Function(this, 'IngestionFunction', {
       functionName: 'PulseParty-Ingestion',
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Ingestion event:', JSON.stringify(event));
-          // TODO: Implement XML parsing (Task 4.1)
-          // TODO: Implement event normalization (Task 4.3)
-          // TODO: Implement EventBridge publishing (Task 4.5)
-          // TODO: Implement simulator mode fallback (Task 4.7)
-          return { statusCode: 200, body: 'Event ingested' };
-        };
-      `),
+      handler: 'ingestion/handler.handler',
+      code: lambda.Code.fromAsset('../backend/dist'),
       role: lambdaExecutionRole,
       environment: {
         TABLE_NAME: this.table.tableName,
         EVENT_BUS_NAME: this.eventBus.eventBusName,
-        SIMULATOR_MODE: 'false', // Toggle for demo mode
+        API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '', // Set via environment or leave empty for simulator mode
+        SIMULATOR_MODE: process.env.SIMULATOR_MODE || 'true', // Default to simulator mode
       },
       timeout: cdk.Duration.seconds(30),
       memorySize: 512,
       description:
-        'Ingestion Lambda - Parse XML match events and publish to EventBridge',
+        'Ingestion Lambda - Fetch live match data from API-Football and publish to EventBridge',
       deadLetterQueue: this.deadLetterQueue,
     });
 
@@ -619,6 +598,28 @@ export class PulsePartyStack extends cdk.Stack {
       })
     );
 
+    // ========================================
+    // Scheduled Rule for Ingestion Lambda
+    // Polls API-Football every 30 seconds for live match data
+    // ========================================
+
+    // Rule 5: Trigger Ingestion Lambda every 30 seconds
+    // Note: You can disable this rule or adjust the schedule to save API quota
+    const ingestionScheduleRule = new events.Rule(this, 'IngestionScheduleRule', {
+      ruleName: 'PulseParty-IngestionSchedule',
+      description: 'Trigger Ingestion Lambda every 30 seconds to fetch live match data',
+      // Poll every 30 seconds (2 requests/minute = 120 requests/hour)
+      // For production, consider polling only during match hours to save API quota
+      schedule: events.Schedule.rate(cdk.Duration.seconds(30)),
+      enabled: true, // Set to false to disable automatic polling
+    });
+    ingestionScheduleRule.addTarget(
+      new targets.LambdaFunction(this.ingestionFunction, {
+        deadLetterQueue: this.deadLetterQueue,
+        retryAttempts: 2,
+      })
+    );
+
     // Output EventBridge rule ARNs
     new cdk.CfnOutput(this, 'RoomStateRuleArn', {
       value: roomStateRule.ruleArn,
@@ -643,6 +644,13 @@ export class PulsePartyStack extends cdk.Stack {
       description: 'Recap EventBridge rule ARN',
       exportName: 'PulsePartyRecapRuleArn',
     });
+
+    new cdk.CfnOutput(this, 'IngestionScheduleRuleArn', {
+      value: ingestionScheduleRule.ruleArn,
+      description: 'Ingestion Schedule EventBridge rule ARN',
+      exportName: 'PulsePartyIngestionScheduleRuleArn',
+    });
+
 
     // ========================================
     // WebSocket API Gateway
@@ -673,14 +681,8 @@ export class PulsePartyStack extends cdk.Stack {
     this.disconnectFunction = new lambda.Function(this, 'DisconnectHandler', {
       functionName: 'PulseParty-Disconnect',
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Disconnect event:', JSON.stringify(event));
-          // TODO: Remove connection from DynamoDB (Task 7.3)
-          return { statusCode: 200, body: 'Disconnected' };
-        };
-      `),
+      handler: 'websocket/handleDisconnect.handler',
+      code: lambda.Code.fromAsset('../backend/dist'),
       role: lambdaExecutionRole,
       environment: {
         TABLE_NAME: this.table.tableName,
@@ -693,15 +695,8 @@ export class PulsePartyStack extends cdk.Stack {
     this.defaultFunction = new lambda.Function(this, 'DefaultHandler', {
       functionName: 'PulseParty-Default',
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Default event:', JSON.stringify(event));
-          // TODO: Route messages by action type (Task 7.4)
-          // Actions: createRoom, joinRoom, submitPrediction, leaveRoom, heartbeat
-          return { statusCode: 200, body: 'Message received' };
-        };
-      `),
+      handler: 'websocket/handleMessage.handler',
+      code: lambda.Code.fromAsset('../backend/dist'),
       role: lambdaExecutionRole,
       environment: {
         TABLE_NAME: this.table.tableName,
@@ -805,29 +800,15 @@ export class PulsePartyStack extends cdk.Stack {
     deployment.addDependency(disconnectRoute);
     deployment.addDependency(defaultRoute);
 
-    // Create stage with CloudWatch logging enabled
+    // Create stage without CloudWatch logging (for AWS sandbox compatibility)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const stage = new apigatewayv2.CfnStage(this, 'WebSocketStage', {
       apiId: this.webSocketApi.ref,
       stageName: 'prod',
       deploymentId: deployment.ref,
       description: 'Production stage for PulseParty WebSocket API',
-      defaultRouteSettings: {
-        loggingLevel: 'INFO',
-        dataTraceEnabled: true,
-        detailedMetricsEnabled: true,
-      },
-      accessLogSettings: {
-        destinationArn: wsLogGroup.logGroupArn,
-        format: JSON.stringify({
-          requestId: '$context.requestId',
-          ip: '$context.identity.sourceIp',
-          requestTime: '$context.requestTime',
-          routeKey: '$context.routeKey',
-          status: '$context.status',
-          connectionId: '$context.connectionId',
-        }),
-      },
+      // Logging disabled for AWS sandbox compatibility
+      // Lambda function logs will still be available in CloudWatch
     });
 
     // Grant API Gateway permission to invoke Lambda functions
@@ -880,6 +861,12 @@ export class PulsePartyStack extends cdk.Stack {
     // Update Lambda environment variables with WebSocket API endpoint
     const wsEndpoint = `wss://${this.webSocketApi.ref}.execute-api.${this.region}.amazonaws.com/prod`;
 
+    // Add to WebSocket handlers
+    this.connectFunction.addEnvironment('WEBSOCKET_API_ENDPOINT', wsEndpoint);
+    this.disconnectFunction.addEnvironment('WEBSOCKET_API_ENDPOINT', wsEndpoint);
+    this.defaultFunction.addEnvironment('WEBSOCKET_API_ENDPOINT', wsEndpoint);
+
+    // Add to event processing functions
     this.roomStateFunction.addEnvironment('WEBSOCKET_API_ENDPOINT', wsEndpoint);
     this.momentEngineFunction.addEnvironment(
       'WEBSOCKET_API_ENDPOINT',

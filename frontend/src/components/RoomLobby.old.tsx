@@ -26,7 +26,9 @@ export function RoomLobby() {
   const { createRoom, joinRoom, wsConnected } = useAppStore();
 
   // State for room creation
-  const [selectedTheme, setSelectedTheme] = useState<'Country' | 'Club' | 'Private'>('Country');
+  const [selectedTheme, setSelectedTheme] = useState<
+    'Country' | 'Club' | 'Private'
+  >('Country');
   const [matchId, setMatchId] = useState('match-demo-001');
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -39,7 +41,9 @@ export function RoomLobby() {
   // State for room discovery
   const [publicRooms, setPublicRooms] = useState<PublicRoom[]>([]);
   const [matchFilter, setMatchFilter] = useState('all');
-  const [themeFilter, setThemeFilter] = useState<'all' | 'Country' | 'Club'>('all');
+  const [themeFilter, setThemeFilter] = useState<'all' | 'Country' | 'Club'>(
+    'all'
+  );
 
   // Mock public rooms for demo (in production, this would come from API)
   useEffect(() => {
@@ -72,8 +76,10 @@ export function RoomLobby() {
 
   // Filter public rooms based on selected filters
   const filteredRooms = publicRooms.filter((room) => {
-    const matchesMatchFilter = matchFilter === 'all' || room.matchId === matchFilter;
-    const matchesThemeFilter = themeFilter === 'all' || room.theme === themeFilter;
+    const matchesMatchFilter =
+      matchFilter === 'all' || room.matchId === matchFilter;
+    const matchesThemeFilter =
+      themeFilter === 'all' || room.theme === themeFilter;
     return matchesMatchFilter && matchesThemeFilter;
   });
 
@@ -93,7 +99,9 @@ export function RoomLobby() {
       // Navigation to room view would happen here
     } catch (error) {
       console.error('Failed to create room:', error);
-      setCreateError(error instanceof Error ? error.message : 'Failed to create room');
+      setCreateError(
+        error instanceof Error ? error.message : 'Failed to create room'
+      );
     } finally {
       setIsCreating(false);
     }
@@ -120,7 +128,9 @@ export function RoomLobby() {
       // Navigation to room view would happen here
     } catch (error) {
       console.error('Failed to join room:', error);
-      setJoinError(error instanceof Error ? error.message : t('room.not_found'));
+      setJoinError(
+        error instanceof Error ? error.message : t('room.not_found')
+      );
     } finally {
       setIsJoining(false);
     }
@@ -152,7 +162,9 @@ export function RoomLobby() {
 
         {/* Theme Selection */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">{t('room.theme')}</label>
+          <label className="block text-sm font-medium mb-2">
+            {t('room.theme')}
+          </label>
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setSelectedTheme('Country')}
@@ -192,7 +204,10 @@ export function RoomLobby() {
 
         {/* Match Selection (simplified for demo) */}
         <div className="mb-4">
-          <label htmlFor="match-select" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="match-select"
+            className="block text-sm font-medium mb-2"
+          >
             Match
           </label>
           <select
@@ -201,8 +216,12 @@ export function RoomLobby() {
             onChange={(e) => setMatchId(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="match-demo-001">Demo Match 1: Team A vs Team B</option>
-            <option value="match-demo-002">Demo Match 2: Team C vs Team D</option>
+            <option value="match-demo-001">
+              Demo Match 1: Team A vs Team B
+            </option>
+            <option value="match-demo-002">
+              Demo Match 2: Team C vs Team D
+            </option>
           </select>
         </div>
 
@@ -261,7 +280,10 @@ export function RoomLobby() {
         {/* Filters */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="match-filter" className="block text-sm font-medium mb-2">
+            <label
+              htmlFor="match-filter"
+              className="block text-sm font-medium mb-2"
+            >
               Match Filter
             </label>
             <select
@@ -277,13 +299,18 @@ export function RoomLobby() {
           </div>
 
           <div>
-            <label htmlFor="theme-filter" className="block text-sm font-medium mb-2">
+            <label
+              htmlFor="theme-filter"
+              className="block text-sm font-medium mb-2"
+            >
               Theme Filter
             </label>
             <select
               id="theme-filter"
               value={themeFilter}
-              onChange={(e) => setThemeFilter(e.target.value as 'all' | 'Country' | 'Club')}
+              onChange={(e) =>
+                setThemeFilter(e.target.value as 'all' | 'Country' | 'Club')
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Themes</option>
@@ -296,7 +323,9 @@ export function RoomLobby() {
         {/* Public Rooms List */}
         <div className="space-y-3">
           {filteredRooms.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No public rooms available</p>
+            <p className="text-center text-gray-500 py-8">
+              No public rooms available
+            </p>
           ) : (
             filteredRooms.map((room) => (
               <div
@@ -305,7 +334,9 @@ export function RoomLobby() {
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono font-bold text-lg">{room.roomCode}</span>
+                    <span className="font-mono font-bold text-lg">
+                      {room.roomCode}
+                    </span>
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                       {room.theme}
                     </span>

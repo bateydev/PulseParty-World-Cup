@@ -17,7 +17,12 @@ import { formatNumber } from '../utils/formatters';
 
 export function PredictionWidget() {
   const { t, i18n } = useTranslation();
-  const { activePredictionWindow, submitPrediction, wsConnected, addMatchEvent } = useAppStore();
+  const {
+    activePredictionWindow,
+    submitPrediction,
+    wsConnected,
+    addMatchEvent,
+  } = useAppStore();
   const locale = i18n.language;
 
   // Local state
@@ -27,7 +32,9 @@ export function PredictionWidget() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [showResult, setShowResult] = useState(false);
-  const [resultType, setResultType] = useState<'correct' | 'incorrect' | null>(null);
+  const [resultType, setResultType] = useState<'correct' | 'incorrect' | null>(
+    null
+  );
   const [pointsAwarded, setPointsAwarded] = useState<number>(0);
 
   // Calculate remaining time
@@ -54,7 +61,10 @@ export function PredictionWidget() {
     const calculateRemaining = () => {
       const expiresAt = new Date(activePredictionWindow.expiresAt);
       const now = new Date();
-      const diff = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
+      const diff = Math.max(
+        0,
+        Math.floor((expiresAt.getTime() - now.getTime()) / 1000)
+      );
       setRemainingSeconds(diff);
 
       if (diff === 0 && !hasSubmitted) {
@@ -76,7 +86,7 @@ export function PredictionWidget() {
     console.log('🔵 handleSelectChoice called with:', choice);
     console.log('🔵 hasSubmitted:', hasSubmitted);
     console.log('🔵 remainingSeconds:', remainingSeconds);
-    
+
     if (hasSubmitted) {
       console.log('❌ Already submitted, ignoring click');
       return;
@@ -85,7 +95,7 @@ export function PredictionWidget() {
       console.log('❌ Time expired, ignoring click');
       return;
     }
-    
+
     console.log('✅ Player selected:', choice);
     setSelectedChoice(choice);
     setSubmitError(null);
@@ -110,14 +120,14 @@ export function PredictionWidget() {
       if (isDemoMode) {
         // Demo mode: simulate submission
         console.log('Demo prediction submitted:', selectedChoice);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } else {
         // Real mode: use WebSocket
         await submitPrediction(activePredictionWindow.windowId, selectedChoice);
       }
-      
+
       setHasSubmitted(true);
-      
+
       // Add prediction to timeline
       const predictionEvent = {
         eventId: `prediction-${Date.now()}`,
@@ -132,7 +142,7 @@ export function PredictionWidget() {
         },
       };
       addMatchEvent(predictionEvent);
-      
+
       // Show success feedback
       setTimeout(() => {
         setShowResult(true);
@@ -141,7 +151,9 @@ export function PredictionWidget() {
       }, 500);
     } catch (error) {
       console.error('Failed to submit prediction:', error);
-      setSubmitError(error instanceof Error ? error.message : 'Failed to submit prediction');
+      setSubmitError(
+        error instanceof Error ? error.message : 'Failed to submit prediction'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -157,7 +169,9 @@ export function PredictionWidget() {
 
   // Format countdown display
   const formatCountdown = (seconds: number): string => {
-    return t('prediction.countdown', { seconds: formatNumber(seconds, locale) });
+    return t('prediction.countdown', {
+      seconds: formatNumber(seconds, locale),
+    });
   };
 
   // Get countdown color based on remaining time
@@ -184,7 +198,9 @@ export function PredictionWidget() {
       'from-indigo-500 to-indigo-700',
       'from-orange-500 to-orange-700',
     ];
-    const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const index = name
+      .split('')
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[index % colors.length];
   };
 
@@ -246,12 +262,14 @@ export function PredictionWidget() {
               aria-pressed={selectedChoice === option}
             >
               {/* Avatar Circle */}
-              <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getPlayerColor(option)} flex items-center justify-center text-white font-bold text-sm shadow-lg ${
-                selectedChoice === option ? 'ring-2 ring-white' : ''
-              }`}>
+              <div
+                className={`w-12 h-12 rounded-full bg-gradient-to-br ${getPlayerColor(option)} flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                  selectedChoice === option ? 'ring-2 ring-white' : ''
+                }`}
+              >
                 {getInitials(option)}
               </div>
-              
+
               {/* Player Name */}
               <span className="text-xs font-semibold text-gray-900 dark:text-white text-center line-clamp-2">
                 {option}
@@ -264,22 +282,25 @@ export function PredictionWidget() {
         {!hasSubmitted && selectedChoice && (
           <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-300 dark:border-blue-700">
             <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
-              You selected: <span className="font-bold text-blue-600 dark:text-blue-400">{selectedChoice}</span>
+              You selected:{' '}
+              <span className="font-bold text-blue-600 dark:text-blue-400">
+                {selectedChoice}
+              </span>
             </p>
           </div>
         )}
-        
+
         {!hasSubmitted && (
           <button
             onClick={handleSubmit}
-            disabled={
-              !selectedChoice ||
-              isSubmitting ||
-              remainingSeconds === 0
-            }
+            disabled={!selectedChoice || isSubmitting || remainingSeconds === 0}
             className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
           >
-            {isSubmitting ? '⏳ ' + t('common.loading') : selectedChoice ? '✅ Submit Prediction' : '👆 Select a player first'}
+            {isSubmitting
+              ? '⏳ ' + t('common.loading')
+              : selectedChoice
+                ? '✅ Submit Prediction'
+                : '👆 Select a player first'}
           </button>
         )}
 
@@ -321,8 +342,8 @@ export function PredictionWidget() {
                   remainingSeconds <= 10
                     ? 'bg-red-500'
                     : remainingSeconds <= 30
-                    ? 'bg-orange-500'
-                    : 'bg-blue-500'
+                      ? 'bg-orange-500'
+                      : 'bg-blue-500'
                 }`}
                 style={{
                   width: `${Math.max(
@@ -331,8 +352,12 @@ export function PredictionWidget() {
                       Math.max(
                         1,
                         Math.floor(
-                          (new Date(activePredictionWindow.expiresAt).getTime() -
-                            new Date(activePredictionWindow.createdAt).getTime()) /
+                          (new Date(
+                            activePredictionWindow.expiresAt
+                          ).getTime() -
+                            new Date(
+                              activePredictionWindow.createdAt
+                            ).getTime()) /
                             1000
                         )
                       )) *

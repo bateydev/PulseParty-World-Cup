@@ -18,6 +18,7 @@
     "back": "Zurück",
     "next": "Weiter",
     "submit": "Absenden",
+    "guest": "Gast",
     "offline": "Sie sind offline. Verbindung wird wiederhergestellt...",
     "online": "Wieder online!",
     "demo_mode": "Demo-Modus: Verwendung simulierter Spieldaten"
@@ -90,15 +91,31 @@
     "title": "Spielzusammenfassung",
     "wrapped_title": "Ihre Zusammenfassung",
     "room_title": "Raumzusammenfassung",
-    "total_points": "Gesamtpunkte",
-    "final_rank": "Endrang",
-    "accuracy": "Genauigkeit",
-    "longest_streak": "Längste Serie",
-    "clutch_moments": "Entscheidende Momente",
+    "noData": "Keine Zusammenfassungsdaten verfügbar",
+    "shareText": "Ich habe {{points}} Punkte erzielt und Rang #{{rank}} mit {{accuracy}}% Genauigkeit in PulseParty erreicht!",
+    "linkCopied": "Link in die Zwischenablage kopiert!",
+    "copyLink": "Link kopieren",
+    "generatedAt": "Erstellt am {{date}}",
+    "stats": {
+      "totalPoints": "Gesamtpunkte",
+      "finalRank": "Endrang",
+      "accuracy": "Genauigkeit",
+      "longestStreak": "Längste Serie",
+      "clutchMoments": "Entscheidende Momente",
+      "clutchDescription": "Vorhersagen in den letzten 10 Sekunden"
+    },
+    "performance": {
+      "champion": "🏆 Champion! Sie haben das Spiel dominiert!",
+      "podium": "🎉 Podiumsplatz! Großartige Leistung!",
+      "accurate": "🎯 Präzise Vorhersagen! Hohe Genauigkeit!",
+      "consistent": "🔥 In Flammen! Erstaunliche Serie!",
+      "clutch": "⚡ Clutch-Meister! Nerven aus Stahl!",
+      "participant": "Danke fürs Mitspielen! Weiter verbessern!"
+    },
+    "shareTitle": "Teilen Sie Ihre Leistung",
     "total_participants": "Gesamtteilnehmer",
     "top_performers": "Top-Performer",
     "most_predicted": "Am häufigsten vorhergesagtes Ereignis",
-    "share_title": "Teilen Sie Ihre Zusammenfassung",
     "view_history": "Verlauf anzeigen"
   },
   "auth": {

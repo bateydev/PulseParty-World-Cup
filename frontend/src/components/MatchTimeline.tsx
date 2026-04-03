@@ -25,6 +25,7 @@ const EVENT_ICONS: Record<string, string> = {
   corner: '🚩',
   shot: '🎯',
   possession: '📊',
+  prediction: '🔮',
 };
 
 // Event type to color mapping
@@ -37,6 +38,7 @@ const EVENT_COLORS: Record<string, string> = {
   corner: 'bg-indigo-50 border-indigo-200',
   shot: 'bg-gray-50 border-gray-200',
   possession: 'bg-teal-50 border-teal-200',
+  prediction: 'bg-purple-100 border-purple-300',
 };
 
 export function MatchTimeline() {
@@ -74,6 +76,8 @@ export function MatchTimeline() {
     const playerOut = metadata?.playerOut || 'Unknown';
     const playerIn = metadata?.playerIn || 'Unknown';
     const percentage = metadata?.percentage || '0';
+    const choice = metadata?.choice || 'Unknown';
+    const predictionType = metadata?.predictionType || 'Unknown';
 
     // Map event type to translation key and interpolate values
     switch (eventType) {
@@ -93,6 +97,8 @@ export function MatchTimeline() {
         return t('events.shot_description', { player });
       case 'possession':
         return t('events.possession_description', { team, percentage });
+      case 'prediction':
+        return `You predicted: ${choice} for ${predictionType.replace(/_/g, ' ')}`;
       default:
         return `${eventType}: ${JSON.stringify(metadata)}`;
     }
@@ -109,16 +115,16 @@ export function MatchTimeline() {
   };
 
   return (
-    <div className="match-timeline w-full max-w-2xl mx-auto p-4">
+    <div className="match-timeline w-full max-w-2xl mx-auto">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-2xl font-semibold">{t('match.timeline')}</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t('match.timeline')}</h2>
       </div>
 
       {/* Timeline Container */}
-      <div className="timeline-container bg-white rounded-lg shadow-md p-4 max-h-[600px] overflow-y-auto">
+      <div className="timeline-container bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 max-h-[600px] overflow-y-auto border border-gray-200 dark:border-gray-700">
         {matchEvents.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <p>{t('common.loading')}</p>
             <p className="text-sm mt-2">Waiting for match events...</p>
           </div>
@@ -127,9 +133,13 @@ export function MatchTimeline() {
             {matchEvents.map((event) => (
               <div
                 key={event.eventId}
-                className={`event-card p-4 rounded-lg border-2 transition-all hover:shadow-md ${getEventColor(
-                  event.eventType
-                )}`}
+                className={`event-card p-4 rounded-xl border-2 transition-all hover:shadow-md bg-white dark:bg-gray-700 ${
+                  event.eventType === 'goal' 
+                    ? 'border-green-400 dark:border-green-500' 
+                    : event.eventType === 'yellow_card' || event.eventType === 'red_card'
+                    ? 'border-yellow-400 dark:border-yellow-500'
+                    : 'border-gray-200 dark:border-gray-600'
+                }`}
               >
                 <div className="flex items-start gap-3">
                   {/* Event Icon */}
@@ -141,16 +151,16 @@ export function MatchTimeline() {
                   <div className="flex-1 min-w-0">
                     {/* Event Type and Timestamp */}
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="font-semibold text-sm uppercase tracking-wide">
+                      <span className="font-semibold text-sm uppercase tracking-wide text-gray-900 dark:text-white">
                         {t(`events.${event.eventType}`, event.eventType)}
                       </span>
-                      <span className="text-xs text-gray-500 flex-shrink-0">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
                         {formatTimestamp(event.timestamp)}
                       </span>
                     </div>
 
                     {/* Event Description */}
-                    <p className="text-sm text-gray-700">{getEventDescription(event)}</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{getEventDescription(event)}</p>
                   </div>
                 </div>
               </div>

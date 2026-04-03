@@ -18,6 +18,7 @@
     "back": "Back",
     "next": "Next",
     "submit": "Submit",
+    "guest": "Guest",
     "offline": "You're offline. Reconnecting...",
     "online": "Back online!",
     "demo_mode": "Demo mode: Using simulated match data"
@@ -90,15 +91,31 @@
     "title": "Match Recap",
     "wrapped_title": "Your Wrapped Recap",
     "room_title": "Room Recap",
-    "total_points": "Total Points",
-    "final_rank": "Final Rank",
-    "accuracy": "Accuracy",
-    "longest_streak": "Longest Streak",
-    "clutch_moments": "Clutch Moments",
+    "noData": "No recap data available",
+    "shareText": "I scored {{points}} points and ranked #{{rank}} with {{accuracy}}% accuracy in PulseParty!",
+    "linkCopied": "Link copied to clipboard!",
+    "copyLink": "Copy Link",
+    "generatedAt": "Generated on {{date}}",
+    "stats": {
+      "totalPoints": "Total Points",
+      "finalRank": "Final Rank",
+      "accuracy": "Accuracy",
+      "longestStreak": "Longest Streak",
+      "clutchMoments": "Clutch Moments",
+      "clutchDescription": "Predictions made in the final 10 seconds"
+    },
+    "performance": {
+      "champion": "🏆 Champion! You dominated the match!",
+      "podium": "🎉 Podium finish! Great performance!",
+      "accurate": "🎯 Sharp predictions! High accuracy!",
+      "consistent": "🔥 On fire! Amazing streak!",
+      "clutch": "⚡ Clutch master! Nerves of steel!",
+      "participant": "Thanks for playing! Keep improving!"
+    },
+    "shareTitle": "Share Your Performance",
     "total_participants": "Total Participants",
     "top_performers": "Top Performers",
     "most_predicted": "Most Predicted Event",
-    "share_title": "Share Your Recap",
     "view_history": "View History"
   },
   "auth": {

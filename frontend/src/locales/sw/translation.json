@@ -18,6 +18,7 @@
     "back": "Rudi",
     "next": "Ifuatayo",
     "submit": "Wasilisha",
+    "guest": "Mgeni",
     "offline": "Uko nje ya mtandao. Inaunganisha tena...",
     "online": "Umerudi mtandaoni!",
     "demo_mode": "Hali ya onyesho: Kutumia data ya mchezo wa majaribio"
@@ -90,15 +91,31 @@
     "title": "Muhtasari wa Mchezo",
     "wrapped_title": "Muhtasari Wako",
     "room_title": "Muhtasari wa Chumba",
-    "total_points": "Jumla ya Pointi",
-    "final_rank": "Nafasi ya Mwisho",
-    "accuracy": "Usahihi",
-    "longest_streak": "Mfululizo Mrefu Zaidi",
-    "clutch_moments": "Nyakati Muhimu",
+    "noData": "Hakuna data ya muhtasari inayopatikana",
+    "shareText": "Nimepata pointi {{points}} na nafasi ya #{{rank}} na usahihi wa {{accuracy}}% katika PulseParty!",
+    "linkCopied": "Kiungo kimenakiliwa kwenye ubao wa kunakili!",
+    "copyLink": "Nakili Kiungo",
+    "generatedAt": "Imetengenezwa tarehe {{date}}",
+    "stats": {
+      "totalPoints": "Jumla ya Pointi",
+      "finalRank": "Nafasi ya Mwisho",
+      "accuracy": "Usahihi",
+      "longestStreak": "Mfululizo Mrefu Zaidi",
+      "clutchMoments": "Nyakati Muhimu",
+      "clutchDescription": "Utabiri uliofanywa katika sekunde 10 za mwisho"
+    },
+    "performance": {
+      "champion": "🏆 Bingwa! Umetawala mchezo!",
+      "podium": "🎉 Nafasi ya juu! Utendaji mzuri!",
+      "accurate": "🎯 Utabiri sahihi! Usahihi wa juu!",
+      "consistent": "🔥 Unawaka! Mfululizo wa ajabu!",
+      "clutch": "⚡ Bwana wa clutch! Misuli ya chuma!",
+      "participant": "Asante kwa kucheza! Endelea kuboresha!"
+    },
+    "shareTitle": "Shiriki Utendaji Wako",
     "total_participants": "Jumla ya Washiriki",
     "top_performers": "Wanamichezo Bora",
     "most_predicted": "Tukio Lililoaguliwa Zaidi",
-    "share_title": "Shiriki Muhtasari Wako",
     "view_history": "Tazama Historia"
   },
   "auth": {

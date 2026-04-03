@@ -18,6 +18,7 @@
     "back": "Retour",
     "next": "Suivant",
     "submit": "Soumettre",
+    "guest": "Invité",
     "offline": "Vous êtes hors ligne. Reconnexion...",
     "online": "De retour en ligne !",
     "demo_mode": "Mode démo : Utilisation de données de match simulées"
@@ -90,15 +91,31 @@
     "title": "Récapitulatif du match",
     "wrapped_title": "Votre récapitulatif",
     "room_title": "Récapitulatif de la salle",
-    "total_points": "Points totaux",
-    "final_rank": "Rang final",
-    "accuracy": "Précision",
-    "longest_streak": "Plus longue série",
-    "clutch_moments": "Moments décisifs",
+    "noData": "Aucune donnée de récapitulatif disponible",
+    "shareText": "J'ai marqué {{points}} points et classé #{{rank}} avec {{accuracy}}% de précision dans PulseParty !",
+    "linkCopied": "Lien copié dans le presse-papiers !",
+    "copyLink": "Copier le lien",
+    "generatedAt": "Généré le {{date}}",
+    "stats": {
+      "totalPoints": "Points totaux",
+      "finalRank": "Rang final",
+      "accuracy": "Précision",
+      "longestStreak": "Plus longue série",
+      "clutchMoments": "Moments décisifs",
+      "clutchDescription": "Prédictions faites dans les 10 dernières secondes"
+    },
+    "performance": {
+      "champion": "🏆 Champion ! Vous avez dominé le match !",
+      "podium": "🎉 Podium ! Excellente performance !",
+      "accurate": "🎯 Prédictions précises ! Haute précision !",
+      "consistent": "🔥 En feu ! Série incroyable !",
+      "clutch": "⚡ Maître du clutch ! Nerfs d'acier !",
+      "participant": "Merci d'avoir joué ! Continuez à vous améliorer !"
+    },
+    "shareTitle": "Partagez votre performance",
     "total_participants": "Participants totaux",
     "top_performers": "Meilleurs joueurs",
     "most_predicted": "Événement le plus prédit",
-    "share_title": "Partagez votre récapitulatif",
     "view_history": "Voir l'historique"
   },
   "auth": {

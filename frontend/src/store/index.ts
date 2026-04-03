@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { WebSocketConnectionManager } from '../websocket/connectionManager';
 
 // Type definitions
 interface User {
@@ -72,7 +73,7 @@ interface AppState {
   // Connection state
   wsConnected: boolean;
   reconnecting: boolean;
-  ws: WebSocket | null;
+  wsManager: WebSocketConnectionManager | null;
 
   // Actions
   setUser: (user: User | null) => void;
@@ -119,16 +120,35 @@ export const useAppStore = create<AppState>()(
       leaderboard: [],
       wsConnected: false,
       reconnecting: false,
-      ws: null,
+      wsManager: null,
 
       // Basic setters
-      setUser: (user) => set({ user }),
+      setUser: (user) => {
+        set({ user });
+        // Update WebSocket session state if connected
+        const state = get();
+        if (state.wsManager) {
+          state.wsManager.updateSessionState({ userId: user?.userId });
+        }
+      },
       setLocale: (locale) => {
         set({ locale });
         // Persist locale change to localStorage
         localStorage.setItem('pulseparty-locale', locale);
+        // Update WebSocket session state if connected
+        const state = get();
+        if (state.wsManager) {
+          state.wsManager.updateSessionState({ locale });
+        }
       },
-      setCurrentRoom: (currentRoom) => set({ currentRoom }),
+      setCurrentRoom: (currentRoom) => {
+        set({ currentRoom });
+        // Update WebSocket session state if connected
+        const state = get();
+        if (state.wsManager) {
+          state.wsManager.updateSessionState({ roomId: currentRoom?.roomId });
+        }
+      },
       setParticipants: (participants) => set({ participants }),
       addMatchEvent: (event) =>
         set((state) => ({ matchEvents: [...state.matchEvents, event] })),
@@ -146,83 +166,121 @@ export const useAppStore = create<AppState>()(
       // WebSocket actions
       connectWebSocket: (url: string) => {
         const state = get();
-        
+
         // Close existing connection if any
-        if (state.ws) {
-          state.ws.close();
+        if (state.wsManager) {
+          state.wsManager.disconnect();
         }
 
-        const ws = new WebSocket(url);
+        // Create new connection manager
+        const manager = new WebSocketConnectionManager({
+          url,
+          userId: state.user?.userId,
+          roomId: state.currentRoom?.roomId,
+          locale: state.locale,
+          maxReconnectAttempts: 5,
 
-        ws.onopen = () => {
-          set({ wsConnected: true, reconnecting: false, ws });
-        };
+          onOpen: () => {
+            console.log('WebSocket connection established');
+            set({ wsConnected: true, reconnecting: false });
+          },
 
-        ws.onclose = () => {
-          set({ wsConnected: false, ws: null });
-        };
+          onClose: () => {
+            console.log('WebSocket connection closed');
+            set({ wsConnected: false });
+          },
 
-        ws.onerror = () => {
-          set({ wsConnected: false });
-        };
+          onMessage: (data) => {
+            try {
+              const message = data;
 
-        ws.onmessage = (event) => {
-          try {
-            const message = JSON.parse(event.data);
-            
-            // Handle different message types
-            switch (message.type) {
-              case 'matchEvent':
-                get().addMatchEvent(message.payload);
-                break;
-              case 'predictionWindow':
-                get().setActivePredictionWindow(message.payload);
-                break;
-              case 'leaderboardUpdate':
-                get().setLeaderboard(message.payload);
-                break;
-              case 'participantUpdate':
-                get().setParticipants(message.payload);
-                break;
-              case 'scoreUpdate':
-                get().updateScore(message.payload);
-                break;
-              case 'roomState':
-                // Initial room state on connection
-                if (message.payload.room) {
-                  get().setCurrentRoom(message.payload.room);
-                }
-                if (message.payload.participants) {
-                  get().setParticipants(message.payload.participants);
-                }
-                if (message.payload.leaderboard) {
-                  get().setLeaderboard(message.payload.leaderboard);
-                }
-                if (message.payload.score) {
-                  get().updateScore(message.payload.score);
-                }
-                break;
+              // Handle different message types
+              switch (message.type) {
+                case 'matchEvent':
+                  get().addMatchEvent(message.payload);
+                  break;
+                case 'predictionWindow':
+                  get().setActivePredictionWindow(message.payload);
+                  break;
+                case 'predictionClosed':
+                  get().setActivePredictionWindow(null);
+                  break;
+                case 'leaderboardUpdate':
+                  get().setLeaderboard(message.payload.leaderboard || message.payload);
+                  break;
+                case 'participantUpdate':
+                  get().setParticipants(message.payload.participants || message.payload);
+                  break;
+                case 'scoreUpdate':
+                  get().updateScore(message.payload.score || message.payload);
+                  break;
+                case 'roomState':
+                  // Initial room state on connection
+                  if (message.payload.room) {
+                    get().setCurrentRoom(message.payload.room);
+                  }
+                  if (message.payload.participants) {
+                    get().setParticipants(message.payload.participants);
+                  }
+                  if (message.payload.leaderboard) {
+                    get().setLeaderboard(message.payload.leaderboard);
+                  }
+                  if (message.payload.score) {
+                    get().updateScore(message.payload.score);
+                  }
+                  break;
+                case 'roomCreated':
+                  if (message.payload.room) {
+                    get().setCurrentRoom(message.payload.room);
+                  }
+                  break;
+                case 'roomJoined':
+                  if (message.payload.room) {
+                    get().setCurrentRoom(message.payload.room);
+                  }
+                  break;
+                default:
+                  console.warn('Unknown WebSocket message type:', message.type);
+              }
+            } catch (error) {
+              console.error('Failed to handle WebSocket message:', error);
             }
-          } catch (error) {
-            console.error('Failed to parse WebSocket message:', error);
-          }
-        };
+          },
 
-        set({ ws });
+          onError: (error) => {
+            console.error('WebSocket error:', error);
+          },
+
+          onReconnecting: (attempt) => {
+            console.log(`Reconnecting... attempt ${attempt}/5`);
+            set({ reconnecting: true });
+          },
+
+          onReconnectFailed: () => {
+            console.error('Failed to reconnect after 5 attempts');
+            set({ reconnecting: false, wsConnected: false });
+          },
+        });
+
+        // Connect to WebSocket
+        manager.connect();
+
+        // Store manager reference
+        set({ wsManager: manager });
       },
 
       disconnectWebSocket: () => {
         const state = get();
-        if (state.ws) {
-          state.ws.close();
-          set({ ws: null, wsConnected: false });
+        if (state.wsManager) {
+          state.wsManager.disconnect();
+          set({ wsManager: null, wsConnected: false });
         }
       },
 
       sendMessage: (message: unknown) => {
         const state = get();
-        if (state.ws && state.wsConnected) {
-          state.ws.send(JSON.stringify(message));
+        if (state.wsManager && state.wsConnected) {
+          state.wsManager.send(message);
         } else {
           console.warn('WebSocket not connected, cannot send message');
         }
@@ -232,7 +290,7 @@ export const useAppStore = create<AppState>()(
       createRoom: async (theme: string, matchId: string): Promise<string> => {
         return new Promise((resolve, reject) => {
           const state = get();
-          
+
           if (!state.wsConnected) {
             reject(new Error('WebSocket not connected'));
             return;
@@ -264,9 +322,9 @@ export const useAppStore = create<AppState>()(
                   if (state.ws && originalOnMessage) {
                     state.ws.onmessage = originalOnMessage;
                   }
-                } else if (originalOnMessage) {
+                } else if (originalOnMessage && state.ws) {
                   // Pass through other messages
-                  originalOnMessage(event);
+                  originalOnMessage.call(state.ws, event);
                 }
               } catch (error) {
                 reject(error);
@@ -284,7 +342,7 @@ export const useAppStore = create<AppState>()(
       joinRoom: async (roomCode: string): Promise<void> => {
         return new Promise((resolve, reject) => {
           const state = get();
-          
+
           if (!state.wsConnected) {
             reject(new Error('WebSocket not connected'));
             return;
@@ -304,7 +362,10 @@ export const useAppStore = create<AppState>()(
             state.ws.onmessage = (event) => {
               try {
                 const response = JSON.parse(event.data);
-                if (response.type === 'roomJoined' || response.type === 'roomState') {
+                if (
+                  response.type === 'roomJoined' ||
+                  response.type === 'roomState'
+                ) {
                   if (response.payload.room) {
                     get().setCurrentRoom(response.payload.room);
                   }
@@ -318,9 +379,9 @@ export const useAppStore = create<AppState>()(
                   if (state.ws && originalOnMessage) {
                     state.ws.onmessage = originalOnMessage;
                   }
-                } else if (originalOnMessage) {
+                } else if (originalOnMessage && state.ws) {
                   // Pass through other messages
-                  originalOnMessage(event);
+                  originalOnMessage.call(state.ws, event);
                 }
               } catch (error) {
                 reject(error);
@@ -337,7 +398,7 @@ export const useAppStore = create<AppState>()(
 
       leaveRoom: () => {
         const state = get();
-        
+
         if (state.wsConnected && state.currentRoom) {
           const message = {
             action: 'leaveRoom',
@@ -359,10 +420,13 @@ export const useAppStore = create<AppState>()(
       },
 
       // Prediction actions
-      submitPrediction: async (windowId: string, choice: string): Promise<void> => {
+      submitPrediction: async (
+        windowId: string,
+        choice: string
+      ): Promise<void> => {
         return new Promise((resolve, reject) => {
           const state = get();
-          
+
           if (!state.wsConnected) {
             reject(new Error('WebSocket not connected'));
             return;

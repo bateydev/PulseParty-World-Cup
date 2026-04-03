@@ -62,17 +62,11 @@ export function WebSocketExample() {
         <div className="space-y-1">
           <p>
             Status:{' '}
-            <span
-              className={
-                wsConnected ? 'text-green-600' : 'text-red-600'
-              }
-            >
+            <span className={wsConnected ? 'text-green-600' : 'text-red-600'}>
               {wsConnected ? 'Connected' : 'Disconnected'}
             </span>
           </p>
-          {reconnecting && (
-            <p className="text-yellow-600">Reconnecting...</p>
-          )}
+          {reconnecting && <p className="text-yellow-600">Reconnecting...</p>}
           <p>User: {user?.displayName || 'Not logged in'}</p>
           <p>Room: {currentRoom?.roomCode || 'Not in room'}</p>
         </div>
@@ -127,9 +121,12 @@ export function WebSocketExample() {
       {activePredictionWindow && (
         <div className="mb-4 p-4 border rounded bg-yellow-50">
           <h2 className="font-semibold mb-2">Active Prediction</h2>
-          <p className="text-sm">Type: {activePredictionWindow.predictionType}</p>
           <p className="text-sm">
-            Expires: {new Date(activePredictionWindow.expiresAt).toLocaleTimeString()}
+            Type: {activePredictionWindow.predictionType}
+          </p>
+          <p className="text-sm">
+            Expires:{' '}
+            {new Date(activePredictionWindow.expiresAt).toLocaleTimeString()}
           </p>
           <div className="mt-2 space-x-2">
             {activePredictionWindow.options.map((option) => (
@@ -169,9 +166,7 @@ export function WebSocketExample() {
             {leaderboard.map((score) => (
               <tr
                 key={score.userId}
-                className={
-                  score.userId === user?.userId ? 'bg-blue-100' : ''
-                }
+                className={score.userId === user?.userId ? 'bg-blue-100' : ''}
               >
                 <td>{score.rank}</td>
                 <td>{score.displayName}</td>

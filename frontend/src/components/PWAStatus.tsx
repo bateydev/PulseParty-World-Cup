@@ -1,11 +1,11 @@
 /**
  * PWA Status Component
- * 
+ *
  * Displays:
  * - Offline indicator when network is unavailable
  * - Update notification when new version is available
  * - Installation prompt for PWA
- * 
+ *
  * Requirements: 6.4, 6.5
  */
 

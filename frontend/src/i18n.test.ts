@@ -91,30 +91,46 @@ describe('i18n Configuration', () => {
 
   it('should handle countdown timer translation with seconds', async () => {
     await i18n.changeLanguage('en');
-    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe('30s remaining');
-    
+    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe(
+      '30s remaining'
+    );
+
     await i18n.changeLanguage('fr');
-    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe('30s restantes');
-    
+    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe(
+      '30s restantes'
+    );
+
     await i18n.changeLanguage('de');
-    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe('30s verbleibend');
-    
+    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe(
+      '30s verbleibend'
+    );
+
     await i18n.changeLanguage('sw');
-    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe('30s zimesalia');
+    expect(i18n.t('prediction.countdown', { seconds: 30 })).toBe(
+      '30s zimesalia'
+    );
   });
 
   it('should handle points interpolation in prediction results', async () => {
     await i18n.changeLanguage('en');
-    expect(i18n.t('prediction.correct', { points: 50 })).toBe('Correct! +50 points');
-    
+    expect(i18n.t('prediction.correct', { points: 50 })).toBe(
+      'Correct! +50 points'
+    );
+
     await i18n.changeLanguage('fr');
-    expect(i18n.t('prediction.correct', { points: 50 })).toBe('Correct ! +50 points');
-    
+    expect(i18n.t('prediction.correct', { points: 50 })).toBe(
+      'Correct ! +50 points'
+    );
+
     await i18n.changeLanguage('de');
-    expect(i18n.t('prediction.correct', { points: 50 })).toBe('Richtig! +50 Punkte');
-    
+    expect(i18n.t('prediction.correct', { points: 50 })).toBe(
+      'Richtig! +50 Punkte'
+    );
+
     await i18n.changeLanguage('sw');
-    expect(i18n.t('prediction.correct', { points: 50 })).toBe('Sahihi! +50 pointi');
+    expect(i18n.t('prediction.correct', { points: 50 })).toBe(
+      'Sahihi! +50 pointi'
+    );
   });
 
   it('should have all required translation keys for room management', () => {
@@ -205,13 +221,13 @@ describe('i18n Configuration', () => {
 
   it('should change language dynamically', async () => {
     expect(i18n.language).toBe('en');
-    
+
     await i18n.changeLanguage('fr');
     expect(i18n.language).toBe('fr');
-    
+
     await i18n.changeLanguage('de');
     expect(i18n.language).toBe('de');
-    
+
     await i18n.changeLanguage('sw');
     expect(i18n.language).toBe('sw');
   });

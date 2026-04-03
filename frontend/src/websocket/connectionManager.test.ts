@@ -181,8 +181,10 @@ describe('WebSocketConnectionManager', () => {
 
     it('should handle malformed JSON messages gracefully', async () => {
       const onMessage = vi.fn();
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       const manager = new WebSocketConnectionManager({
         url: 'wss://example.com/ws',
         onMessage,
@@ -221,8 +223,10 @@ describe('WebSocketConnectionManager', () => {
     });
 
     it('should not send messages when disconnected', () => {
-      const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+      const consoleWarn = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+
       const manager = new WebSocketConnectionManager({
         url: 'wss://example.com/ws',
       });
@@ -251,7 +255,9 @@ describe('WebSocketConnectionManager', () => {
       // Simulate connection close
       const ws = (manager as any).ws;
       ws.readyState = MockWebSocket.CLOSED;
-      ws.onclose(new CloseEvent('close', { code: 1006, reason: 'Abnormal closure' }));
+      ws.onclose(
+        new CloseEvent('close', { code: 1006, reason: 'Abnormal closure' })
+      );
 
       // First reconnection attempt: 1000ms delay
       await vi.advanceTimersByTimeAsync(1000);
@@ -262,7 +268,7 @@ describe('WebSocketConnectionManager', () => {
       const ws2 = (manager as any).ws;
       ws2.readyState = MockWebSocket.CLOSED;
       ws2.onclose(new CloseEvent('close', { code: 1006 }));
-      
+
       await vi.advanceTimersByTimeAsync(1000);
       expect(onReconnecting).toHaveBeenCalledWith(1); // Reset after successful connection
 
@@ -271,7 +277,7 @@ describe('WebSocketConnectionManager', () => {
       const ws3 = (manager as any).ws;
       ws3.readyState = MockWebSocket.CLOSED;
       ws3.onclose(new CloseEvent('close', { code: 1006 }));
-      
+
       await vi.advanceTimersByTimeAsync(1000);
       expect(onReconnecting).toHaveBeenCalledWith(1); // Reset again
     });
@@ -279,7 +285,7 @@ describe('WebSocketConnectionManager', () => {
     it('should stop reconnecting after max attempts', async () => {
       const onReconnecting = vi.fn();
       const onReconnectFailed = vi.fn();
-      
+
       const manager = new WebSocketConnectionManager({
         url: 'wss://example.com/ws',
         maxReconnectAttempts: 2, // Use smaller number for easier testing
@@ -300,7 +306,7 @@ describe('WebSocketConnectionManager', () => {
     it('should reset reconnection attempts on successful connection', async () => {
       const onReconnecting = vi.fn();
       const onOpen = vi.fn();
-      
+
       const manager = new WebSocketConnectionManager({
         url: 'wss://example.com/ws',
         onReconnecting,

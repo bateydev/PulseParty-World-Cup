@@ -1,6 +1,6 @@
 /**
  * Unit tests for PWA registration module
- * 
+ *
  * Tests:
  * - PWA status initialization
  * - Online/offline detection
@@ -25,12 +25,12 @@ describe('PWA Registration', () => {
   describe('getPWAStatus', () => {
     it('should return initial PWA status', () => {
       const status = getPWAStatus();
-      
+
       expect(status).toHaveProperty('isOnline');
       expect(status).toHaveProperty('isInstalled');
       expect(status).toHaveProperty('needsUpdate');
       expect(status).toHaveProperty('registration');
-      
+
       expect(typeof status.isOnline).toBe('boolean');
       expect(typeof status.isInstalled).toBe('boolean');
       expect(typeof status.needsUpdate).toBe('boolean');
@@ -51,7 +51,7 @@ describe('PWA Registration', () => {
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       });
-      
+
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         configurable: true,
@@ -70,7 +70,7 @@ describe('PWA Registration', () => {
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       });
-      
+
       Object.defineProperty(window, 'matchMedia', {
         writable: true,
         configurable: true,
@@ -85,9 +85,9 @@ describe('PWA Registration', () => {
   describe('onPWAStatusChange', () => {
     it('should call callback immediately with current status', () => {
       const callback = vi.fn();
-      
+
       onPWAStatusChange(callback);
-      
+
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -101,11 +101,11 @@ describe('PWA Registration', () => {
 
     it('should return unsubscribe function', () => {
       const callback = vi.fn();
-      
+
       const unsubscribe = onPWAStatusChange(callback);
-      
+
       expect(typeof unsubscribe).toBe('function');
-      
+
       // Calling unsubscribe should not throw
       expect(() => unsubscribe()).not.toThrow();
     });
@@ -114,9 +114,9 @@ describe('PWA Registration', () => {
   describe('setupNetworkListeners', () => {
     it('should set up online and offline event listeners', () => {
       const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
-      
+
       setupNetworkListeners();
-      
+
       expect(addEventListenerSpy).toHaveBeenCalledWith(
         'online',
         expect.any(Function)

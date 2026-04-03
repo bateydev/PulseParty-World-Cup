@@ -35,7 +35,7 @@ export class WebSocketConnectionManager {
   constructor(config: ConnectionConfig) {
     this.config = config;
     this.maxReconnectAttempts = config.maxReconnectAttempts ?? 5;
-    
+
     // Store session state for reconnection
     this.sessionState = {
       userId: config.userId,
@@ -116,15 +116,15 @@ export class WebSocketConnectionManager {
    */
   private buildConnectionUrl(): string {
     const url = new URL(this.config.url);
-    
+
     if (this.sessionState.userId) {
       url.searchParams.set('userId', this.sessionState.userId);
     }
-    
+
     if (this.sessionState.roomId) {
       url.searchParams.set('roomId', this.sessionState.roomId);
     }
-    
+
     if (this.sessionState.locale) {
       url.searchParams.set('locale', this.sessionState.locale);
     }
@@ -196,7 +196,10 @@ export class WebSocketConnectionManager {
     this.reconnectAttempts++;
 
     // Calculate exponential backoff delay
-    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts - 1), 16000);
+    const delay = Math.min(
+      1000 * Math.pow(2, this.reconnectAttempts - 1),
+      16000
+    );
 
     console.log(
       `Scheduling reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${delay}ms`

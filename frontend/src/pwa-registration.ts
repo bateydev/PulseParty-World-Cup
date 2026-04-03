@@ -1,12 +1,12 @@
 /**
  * PWA Service Worker Registration and Lifecycle Management
- * 
+ *
  * This module handles:
  * - Service worker registration
  * - Update notifications
  * - Offline/online status detection
  * - Cache management
- * 
+ *
  * Requirements: 6.1, 6.2, 6.4, 6.5
  */
 
@@ -20,7 +20,7 @@ export interface PWAStatus {
 type PWAStatusCallback = (status: PWAStatus) => void;
 
 let statusCallback: PWAStatusCallback | null = null;
-let currentStatus: PWAStatus = {
+const currentStatus: PWAStatus = {
   isOnline: navigator.onLine,
   isInstalled: false,
   needsUpdate: false,
@@ -39,9 +39,9 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
   try {
     // The service worker is automatically registered by vite-plugin-pwa
     // This function sets up additional lifecycle handlers
-    
+
     const registration = await navigator.serviceWorker.ready;
-    
+
     currentStatus.isInstalled = true;
     currentStatus.registration = registration;
     notifyStatusChange();
@@ -57,11 +57,14 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       if (!newWorker) return;
 
       newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+        if (
+          newWorker.state === 'installed' &&
+          navigator.serviceWorker.controller
+        ) {
           // New service worker available
           currentStatus.needsUpdate = true;
           notifyStatusChange();
-          
+
           console.log('New version available! Reload to update.');
         }
       });
@@ -115,10 +118,10 @@ export function setupNetworkListeners(): void {
  */
 export function onPWAStatusChange(callback: PWAStatusCallback): () => void {
   statusCallback = callback;
-  
+
   // Immediately call with current status
   callback(currentStatus);
-  
+
   // Return unsubscribe function
   return () => {
     statusCallback = null;
@@ -143,7 +146,7 @@ export async function clearAllCaches(): Promise<void> {
 
   try {
     const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map(name => caches.delete(name)));
+    await Promise.all(cacheNames.map((name) => caches.delete(name)));
     console.log('All caches cleared');
   } catch (error) {
     console.error('Failed to clear caches:', error);
@@ -176,7 +179,7 @@ function notifyStatusChange(): void {
 export function initializePWA(): void {
   setupNetworkListeners();
   registerServiceWorker();
-  
+
   // Log installation status
   if (isStandalone()) {
     console.log('Running as installed PWA');

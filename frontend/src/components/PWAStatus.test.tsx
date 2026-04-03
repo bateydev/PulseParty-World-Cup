@@ -1,6 +1,6 @@
 /**
  * Unit tests for PWA Status Component
- * 
+ *
  * Tests:
  * - Offline indicator display
  * - Update notification display
@@ -44,36 +44,42 @@ describe('PWAStatusIndicator', () => {
 
   it('should display offline indicator when offline', () => {
     // Mock offline status
-    vi.mocked(pwaRegistration.onPWAStatusChange).mockImplementation((callback) => {
-      callback({
-        isOnline: false,
-        isInstalled: false,
-        needsUpdate: false,
-        registration: null,
-      });
-      return () => {};
-    });
+    vi.mocked(pwaRegistration.onPWAStatusChange).mockImplementation(
+      (callback) => {
+        callback({
+          isOnline: false,
+          isInstalled: false,
+          needsUpdate: false,
+          registration: null,
+        });
+        return () => {};
+      }
+    );
 
     render(<PWAStatusIndicator />);
-    
+
     expect(screen.getByText(/offline/i)).toBeInTheDocument();
-    expect(screen.getByText(/some features may be limited/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/some features may be limited/i)
+    ).toBeInTheDocument();
   });
 
   it('should display update notification when update is available', () => {
     // Mock update available status
-    vi.mocked(pwaRegistration.onPWAStatusChange).mockImplementation((callback) => {
-      callback({
-        isOnline: true,
-        isInstalled: true,
-        needsUpdate: true,
-        registration: {} as ServiceWorkerRegistration,
-      });
-      return () => {};
-    });
+    vi.mocked(pwaRegistration.onPWAStatusChange).mockImplementation(
+      (callback) => {
+        callback({
+          isOnline: true,
+          isInstalled: true,
+          needsUpdate: true,
+          registration: {} as ServiceWorkerRegistration,
+        });
+        return () => {};
+      }
+    );
 
     render(<PWAStatusIndicator />);
-    
+
     expect(screen.getByText(/update available/i)).toBeInTheDocument();
     expect(screen.getByText(/update now/i)).toBeInTheDocument();
   });
@@ -82,15 +88,17 @@ describe('PWAStatusIndicator', () => {
 describe('usePWAStatus', () => {
   beforeEach(() => {
     // Reset to default mock
-    vi.mocked(pwaRegistration.onPWAStatusChange).mockImplementation((callback) => {
-      callback({
-        isOnline: true,
-        isInstalled: false,
-        needsUpdate: false,
-        registration: null,
-      });
-      return () => {};
-    });
+    vi.mocked(pwaRegistration.onPWAStatusChange).mockImplementation(
+      (callback) => {
+        callback({
+          isOnline: true,
+          isInstalled: false,
+          needsUpdate: false,
+          registration: null,
+        });
+        return () => {};
+      }
+    );
   });
 
   it('should return PWA status', () => {
@@ -106,7 +114,7 @@ describe('usePWAStatus', () => {
     };
 
     render(<TestComponent />);
-    
+
     expect(screen.getByTestId('online')).toHaveTextContent('true');
     expect(screen.getByTestId('installed')).toHaveTextContent('false');
     expect(screen.getByTestId('needsUpdate')).toHaveTextContent('false');

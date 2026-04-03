@@ -356,8 +356,8 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Set up translation files structure
     - _Requirements: 8.1, 8.2_
 
-- [-] 16. Implement Zustand state management
-  - [-] 16.1 Create app state store
+- [x] 16. Implement Zustand state management
+  - [x] 16.1 Create app state store
     - Define AppState interface with user, room, match, prediction, leaderboard, connection state
     - Implement state actions: connectWebSocket, createRoom, joinRoom, submitPrediction, setLocale
     - Add middleware for persistence to localStorage
@@ -369,13 +369,13 @@ The implementation follows an incremental approach: infrastructure setup → bac
     - Test WebSocket message handling
 
 - [ ] 17. Implement WebSocket client integration
-  - [~] 17.1 Create WebSocket connection manager
+  - [x] 17.1 Create WebSocket connection manager
     - Write connectWebSocket function with automatic reconnection
     - Implement exponential backoff retry logic
     - Handle connection, disconnection, and message events
     - _Requirements: 9.1, 7.7_
   
-  - [~] 17.2 Implement message handlers for state updates
+  - [-] 17.2 Implement message handlers for state updates
     - Handle match event messages and update matchEvents state
     - Handle prediction window messages and update activePredictionWindow state
     - Handle leaderboard messages and update leaderboard state

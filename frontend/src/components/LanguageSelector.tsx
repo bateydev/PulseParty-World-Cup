@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * LanguageSelector Component
- * 
+ *
  * Provides a dropdown to switch between supported languages.
  * Language preference is automatically persisted to localStorage.
- * 
+ *
  * Supported languages: EN, FR, DE, SW
  * Requirements: 8.2, 8.3, 8.4
  */
@@ -20,14 +20,19 @@ export function LanguageSelector() {
     { code: 'sw', name: 'Swahili', nativeName: 'Kiswahili' },
   ];
 
-  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleLanguageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const newLanguage = event.target.value;
     i18n.changeLanguage(newLanguage);
   };
 
   return (
     <div className="language-selector">
-      <label htmlFor="language-select" className="block text-sm font-medium mb-1">
+      <label
+        htmlFor="language-select"
+        className="block text-sm font-medium mb-1"
+      >
         {t('settings.language')}
       </label>
       <select

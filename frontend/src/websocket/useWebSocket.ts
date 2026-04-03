@@ -9,7 +9,7 @@ import { WebSocketConnectionManager } from './connectionManager';
  */
 export function useWebSocket(wsUrl: string) {
   const managerRef = useRef<WebSocketConnectionManager | null>(null);
-  
+
   const {
     user,
     currentRoom,
@@ -38,31 +38,31 @@ export function useWebSocket(wsUrl: string) {
       roomId: currentRoom?.roomId,
       locale,
       maxReconnectAttempts: 5,
-      
+
       onOpen: () => {
         console.log('WebSocket connection established');
         setWsConnected(true);
         setReconnecting(false);
       },
-      
+
       onClose: () => {
         console.log('WebSocket connection closed');
         setWsConnected(false);
       },
-      
+
       onMessage: (data) => {
         handleWebSocketMessage(data);
       },
-      
+
       onError: (error) => {
         console.error('WebSocket error:', error);
       },
-      
+
       onReconnecting: (attempt) => {
         console.log(`Reconnecting... attempt ${attempt}/5`);
         setReconnecting(true);
       },
-      
+
       onReconnectFailed: () => {
         console.error('Failed to reconnect after 5 attempts');
         setReconnecting(false);
@@ -111,19 +111,21 @@ export function useWebSocket(wsUrl: string) {
             theme: payload.room.theme,
           });
         }
-        
+
         if (payload.participants) {
-          setParticipants(payload.participants.map((p: any) => ({
-            userId: p.userId,
-            displayName: p.displayName || p.userId,
-            isGuest: true,
-          })));
+          setParticipants(
+            payload.participants.map((p: any) => ({
+              userId: p.userId,
+              displayName: p.displayName || p.userId,
+              isGuest: true,
+            }))
+          );
         }
-        
+
         if (payload.leaderboard) {
           setLeaderboard(payload.leaderboard);
         }
-        
+
         if (payload.currentScore) {
           updateScore(payload.currentScore);
         }
@@ -158,11 +160,13 @@ export function useWebSocket(wsUrl: string) {
       case 'participantUpdate':
         // Participant joined or left
         if (payload.participants) {
-          setParticipants(payload.participants.map((p: any) => ({
-            userId: p.userId,
-            displayName: p.displayName || p.userId,
-            isGuest: true,
-          })));
+          setParticipants(
+            payload.participants.map((p: any) => ({
+              userId: p.userId,
+              displayName: p.displayName || p.userId,
+              isGuest: true,
+            }))
+          );
         }
         break;
 

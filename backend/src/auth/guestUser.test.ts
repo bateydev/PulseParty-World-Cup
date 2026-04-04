@@ -3,7 +3,9 @@ import * as dynamodb from '../utils/dynamodb';
 
 // Mock the dynamodb module
 jest.mock('../utils/dynamodb');
-const mockPutItem = dynamodb.putItem as jest.MockedFunction<typeof dynamodb.putItem>;
+const mockPutItem = dynamodb.putItem as jest.MockedFunction<
+  typeof dynamodb.putItem
+>;
 
 describe('Guest User Generation', () => {
   beforeEach(() => {
@@ -40,9 +42,9 @@ describe('Guest User Generation', () => {
     it('should set TTL to 24 hours from creation', async () => {
       mockPutItem.mockResolvedValue();
 
-      const beforeTime = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
+      const beforeTime = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
       const guestUser = await generateGuestUser();
-      const afterTime = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
+      const afterTime = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 
       // TTL should be approximately 24 hours from now (within 1 second tolerance)
       expect(guestUser.ttl).toBeGreaterThanOrEqual(beforeTime - 1);
@@ -103,7 +105,7 @@ describe('Guest User Generation', () => {
       mockPutItem.mockResolvedValue();
 
       const displayNames = new Set<string>();
-      
+
       // Generate 20 guest users and collect display names
       for (let i = 0; i < 20; i++) {
         const user = await generateGuestUser();
@@ -127,8 +129,10 @@ describe('Guest User Generation', () => {
       const guestUser = await generateGuestUser();
 
       // Verify ISO 8601 format
-      expect(guestUser.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-      
+      expect(guestUser.createdAt).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      );
+
       // Verify it's a valid date
       const date = new Date(guestUser.createdAt);
       expect(date.getTime()).not.toBeNaN();

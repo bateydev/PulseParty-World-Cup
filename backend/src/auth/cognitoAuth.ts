@@ -4,7 +4,8 @@ import jwksClient from 'jwks-rsa';
 
 const getTableName = () => process.env.TABLE_NAME || '';
 const getUserPoolId = () => process.env.USER_POOL_ID || '';
-const getRegion = () => process.env.REGION || process.env.AWS_REGION || 'us-east-1';
+const getRegion = () =>
+  process.env.REGION || process.env.AWS_REGION || 'us-east-1';
 
 // JWKS client for JWT verification
 const jwksClientInstance = jwksClient({
@@ -109,7 +110,9 @@ export async function verifyJWT(token: string): Promise<JWTPayload> {
     return payload;
   } catch (error) {
     console.error('JWT verification failed:', error);
-    throw new Error(`JWT verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `JWT verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -153,15 +156,25 @@ export async function createOrUpdateAuthenticatedUser(
         PK: existingUser.PK,
         SK: existingUser.SK,
       },
-      UpdateExpression: 'SET ' + Object.keys(updates).map((key, i) => `#${key} = :val${i}`).join(', '),
-      ExpressionAttributeNames: Object.keys(updates).reduce((acc, key) => {
-        acc[`#${key}`] = key;
-        return acc;
-      }, {} as Record<string, string>),
-      ExpressionAttributeValues: Object.keys(updates).reduce((acc, key, i) => {
-        acc[`:val${i}`] = updates[key];
-        return acc;
-      }, {} as Record<string, any>),
+      UpdateExpression:
+        'SET ' +
+        Object.keys(updates)
+          .map((key, i) => `#${key} = :val${i}`)
+          .join(', '),
+      ExpressionAttributeNames: Object.keys(updates).reduce(
+        (acc, key) => {
+          acc[`#${key}`] = key;
+          return acc;
+        },
+        {} as Record<string, string>
+      ),
+      ExpressionAttributeValues: Object.keys(updates).reduce(
+        (acc, key, i) => {
+          acc[`:val${i}`] = updates[key];
+          return acc;
+        },
+        {} as Record<string, any>
+      ),
     });
 
     console.log('Updated authenticated user:', {
@@ -182,7 +195,11 @@ export async function createOrUpdateAuthenticatedUser(
 
   // Create new authenticated user
   const userId = `auth-${cognitoId}`;
-  const defaultDisplayName = displayName || jwtPayload['custom:displayName'] || email.split('@')[0] || 'User';
+  const defaultDisplayName =
+    displayName ||
+    jwtPayload['custom:displayName'] ||
+    email.split('@')[0] ||
+    'User';
 
   const userEntity: UserEntity = {
     PK: `USER#${userId}`,
@@ -221,15 +238,17 @@ export async function createOrUpdateAuthenticatedUser(
 /**
  * Get user by Cognito ID
  * Requirements: 7.4
- * 
+ *
  * @param cognitoId - Cognito user ID (sub claim from JWT)
  * @returns User entity or null if not found
  */
-async function getUserByCognitoId(cognitoId: string): Promise<UserEntity | null> {
+async function getUserByCognitoId(
+  cognitoId: string
+): Promise<UserEntity | null> {
   // Note: This requires a GSI on cognitoId for efficient lookup
   // For now, we'll use a simple approach with the userId pattern
   const userId = `auth-${cognitoId}`;
-  
+
   try {
     const result = await getItem({
       TableName: getTableName(),
@@ -253,7 +272,7 @@ async function getUserByCognitoId(cognitoId: string): Promise<UserEntity | null>
 /**
  * Update user display name
  * Requirements: 7.5
- * 
+ *
  * @param userId - User ID
  * @param displayName - New display name
  */
@@ -280,11 +299,13 @@ export async function updateUserDisplayName(
 /**
  * Get user by user ID
  * Requirements: 7.4
- * 
+ *
  * @param userId - User ID
  * @returns User entity or null if not found
  */
-export async function getUserById(userId: string): Promise<AuthenticatedUser | null> {
+export async function getUserById(
+  userId: string
+): Promise<AuthenticatedUser | null> {
   try {
     const result = await getItem({
       TableName: getTableName(),

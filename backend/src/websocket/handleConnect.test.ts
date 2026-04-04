@@ -17,9 +17,10 @@ const mockQueryItems = dynamodb.queryItems as jest.MockedFunction<
 
 // Mock the guest user generation
 jest.mock('../auth/guestUser');
-const mockGenerateGuestUser = guestUser.generateGuestUser as jest.MockedFunction<
-  typeof guestUser.generateGuestUser
->;
+const mockGenerateGuestUser =
+  guestUser.generateGuestUser as jest.MockedFunction<
+    typeof guestUser.generateGuestUser
+  >;
 
 // Mock AWS SDK
 jest.mock('@aws-sdk/client-apigatewaymanagementapi', () => ({
@@ -119,7 +120,7 @@ describe('WebSocket Connection Handler', () => {
     it('should generate guest userId if not provided', async () => {
       const event = createMockEvent();
       mockPutItem.mockResolvedValue();
-      
+
       const mockGuestUserId = 'guest-1234567890-abcd1234';
       const mockGuestDisplayName = 'SwiftTiger123';
       mockGenerateGuestUser.mockResolvedValue({
@@ -128,7 +129,7 @@ describe('WebSocket Connection Handler', () => {
         isGuest: true,
         locale: 'en',
         createdAt: new Date().toISOString(),
-        ttl: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+        ttl: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
       });
 
       const result = await handler(event);
@@ -148,7 +149,7 @@ describe('WebSocket Connection Handler', () => {
     it('should generate guest user with provided locale', async () => {
       const event = createMockEvent({ locale: 'fr' });
       mockPutItem.mockResolvedValue();
-      
+
       const mockGuestUserId = 'guest-1234567890-abcd1234';
       const mockGuestDisplayName = 'BraveLion456';
       mockGenerateGuestUser.mockResolvedValue({
@@ -157,7 +158,7 @@ describe('WebSocket Connection Handler', () => {
         isGuest: true,
         locale: 'fr',
         createdAt: new Date().toISOString(),
-        ttl: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+        ttl: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
       });
 
       const result = await handler(event);

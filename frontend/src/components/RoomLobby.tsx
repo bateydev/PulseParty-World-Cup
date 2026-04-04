@@ -1,6 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store';
+
+interface Match {
+  id: string;
+  name: string;
+  league: string;
+}
+
+interface MatchesByTheme {
+  Country: Match[];
+  Club: Match[];
+  Private: Match[];
+}
 
 interface RoomLobbyProps {
   onJoinRoom: (matchInfo?: {
@@ -31,6 +43,94 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
   });
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+  const [matches, setMatches] = useState<MatchesByTheme>({
+    Country: [],
+    Club: [],
+    Private: [],
+  });
+  const [isLoadingMatches, setIsLoadingMatches] = useState(true);
+  const [matchesError, setMatchesError] = useState<string | null>(null);
+
+  // Fetch matches from Match API
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        setIsLoadingMatches(true);
+        setMatchesError(null);
+
+        // Get Match API URL from environment variable
+        const matchApiUrl =
+          import.meta.env.VITE_MATCH_API_URL ||
+          'https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/matches';
+
+        console.log('Fetching matches from:', matchApiUrl);
+
+        const response = await fetch(matchApiUrl);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch matches: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Transform API response to match component format
+        const transformedMatches: MatchesByTheme = {
+          Country: data.Country?.map((match: any) => ({
+            id: match.matchId,
+            name: `${match.homeTeam} vs ${match.awayTeam}`,
+            league: match.league,
+            status: match.status,
+            startTime: match.startTime,
+          })) || [],
+          Club: data.Club?.map((match: any) => ({
+            id: match.matchId,
+            name: `${match.homeTeam} vs ${match.awayTeam}`,
+            league: match.league,
+            status: match.status,
+            startTime: match.startTime,
+          })) || [],
+          Private: data.Private?.map((match: any) => ({
+            id: match.matchId,
+            name: `${match.homeTeam} vs ${match.awayTeam}`,
+            league: match.league,
+            status: match.status,
+            startTime: match.startTime,
+          })) || [],
+        };
+
+        setMatches(transformedMatches);
+        console.log('Matches loaded:', transformedMatches);
+      } catch (error) {
+        console.error('Error fetching matches:', error);
+        setMatchesError(
+          error instanceof Error ? error.message : 'Failed to load matches'
+        );
+
+        // Fallback to demo matches if API fails
+        setMatches({
+          Country: [
+            {
+              id: 'match-demo-1',
+              name: 'Demo Match 1',
+              league: 'Demo League',
+            },
+          ],
+          Club: [
+            {
+              id: 'match-demo-2',
+              name: 'Demo Match 2',
+              league: 'Demo League',
+            },
+          ],
+          Private: [],
+        });
+      } finally {
+        setIsLoadingMatches(false);
+      }
+    };
+
+    fetchMatches();
+  }, []);
 
   const themes = [
     {
@@ -53,67 +153,10 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
     },
   ];
 
-  // Available matches by theme
-  // Match IDs align with backend matchId format
-  const matchesByTheme = {
-    Country: [
-      {
-        id: 'match-country-1',
-        name: 'Germany vs France',
-        league: 'UEFA Nations League',
-      },
-      {
-        id: 'match-country-2',
-        name: 'Brazil vs Argentina',
-        league: 'CONMEBOL',
-      },
-      {
-        id: 'match-country-3',
-        name: 'England vs Spain',
-        league: 'International Friendly',
-      },
-      {
-        id: 'match-country-4',
-        name: 'Portugal vs Italy',
-        league: 'UEFA Nations League',
-      },
-    ],
-    Club: [
-      {
-        id: 'match-club-1',
-        name: 'Bayern Munich vs Borussia Dortmund',
-        league: 'Bundesliga',
-      },
-      {
-        id: 'match-club-2',
-        name: 'Real Madrid vs Barcelona',
-        league: 'La Liga',
-      },
-      {
-        id: 'match-club-3',
-        name: 'Manchester City vs Liverpool',
-        league: 'Premier League',
-      },
-      { id: 'match-club-4', name: 'PSG vs Marseille', league: 'Ligue 1' },
-    ],
-    Private: [
-      {
-        id: 'match-private-1',
-        name: 'Custom Match 1',
-        league: 'Private League',
-      },
-      {
-        id: 'match-private-2',
-        name: 'Custom Match 2',
-        league: 'Private League',
-      },
-    ],
-  };
-
   // Get filtered matches based on selected theme
   const getFilteredMatches = () => {
     if (!selectedTheme) return [];
-    return matchesByTheme[selectedTheme];
+    return matches[selectedTheme];
   };
 
   // Button handlers with real WebSocket integration
@@ -309,27 +352,71 @@ export function RoomLobby({ onJoinRoom }: RoomLobbyProps) {
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {getFilteredMatches().map((match) => (
-                  <button
-                    key={match.id}
-                    onClick={() => setSelectedMatch(match)}
-                    className="w-full text-left p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border-2 border-transparent hover:border-blue-500 transition-all transform hover:scale-102 active:scale-98"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-900 dark:text-white">
-                          {match.name}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          {match.league}
-                        </p>
-                      </div>
-                      <span className="text-2xl">⚽</span>
+              {/* Loading State */}
+              {isLoadingMatches && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Loading matches...
+                  </p>
+                </div>
+              )}
+
+              {/* Error State */}
+              {matchesError && !isLoadingMatches && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-4">
+                  <div className="flex items-start space-x-3">
+                    <span className="text-2xl">⚠️</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                        Failed to load matches
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {matchesError}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                        Showing demo matches as fallback.
+                      </p>
                     </div>
-                  </button>
-                ))}
-              </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Match List */}
+              {!isLoadingMatches && (
+                <div className="space-y-3">
+                  {getFilteredMatches().length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 dark:text-gray-400 mb-2">
+                        No matches available
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500">
+                        Check back later for live matches
+                      </p>
+                    </div>
+                  ) : (
+                    getFilteredMatches().map((match) => (
+                      <button
+                        key={match.id}
+                        onClick={() => setSelectedMatch(match)}
+                        className="w-full text-left p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border-2 border-transparent hover:border-blue-500 transition-all transform hover:scale-102 active:scale-98"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="font-bold text-gray-900 dark:text-white">
+                              {match.name}
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                              {match.league}
+                            </p>
+                          </div>
+                          <span className="text-2xl">⚽</span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           )}
 

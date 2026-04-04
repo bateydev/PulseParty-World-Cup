@@ -5,7 +5,10 @@
 import { handler } from './handler';
 import { generateWrappedRecap } from './wrappedRecapGeneration';
 import { generateRoomRecap } from './roomRecapGeneration';
-import { getActiveRoomsByMatch, broadcastToRoom } from '../roomState/roomManagement';
+import {
+  getActiveRoomsByMatch,
+  broadcastToRoom,
+} from '../roomState/roomManagement';
 import { queryItems } from '../utils/dynamodb';
 import { EventBridgeEvent } from 'aws-lambda';
 
@@ -34,7 +37,9 @@ describe('Recap Lambda Handler', () => {
     jest.clearAllMocks();
   });
 
-  const createMatchEndEvent = (matchId: string): EventBridgeEvent<'MatchEvent', any> => ({
+  const createMatchEndEvent = (
+    matchId: string
+  ): EventBridgeEvent<'MatchEvent', any> => ({
     version: '0',
     id: 'event-123',
     'detail-type': 'MatchEvent',
@@ -148,8 +153,16 @@ describe('Recap Lambda Handler', () => {
 
       // Verify wrapped recaps were generated for both users
       expect(mockGenerateWrappedRecap).toHaveBeenCalledTimes(2);
-      expect(mockGenerateWrappedRecap).toHaveBeenCalledWith('user-1', roomId, matchId);
-      expect(mockGenerateWrappedRecap).toHaveBeenCalledWith('user-2', roomId, matchId);
+      expect(mockGenerateWrappedRecap).toHaveBeenCalledWith(
+        'user-1',
+        roomId,
+        matchId
+      );
+      expect(mockGenerateWrappedRecap).toHaveBeenCalledWith(
+        'user-2',
+        roomId,
+        matchId
+      );
 
       // Verify broadcasts were sent (1 room recap + 2 wrapped recaps)
       expect(mockBroadcastToRoom).toHaveBeenCalledTimes(3);
@@ -200,7 +213,9 @@ describe('Recap Lambda Handler', () => {
       ]);
 
       // First room fails
-      mockGenerateRoomRecap.mockRejectedValueOnce(new Error('Room recap failed'));
+      mockGenerateRoomRecap.mockRejectedValueOnce(
+        new Error('Room recap failed')
+      );
 
       // Second room succeeds
       mockGenerateRoomRecap.mockResolvedValueOnce({

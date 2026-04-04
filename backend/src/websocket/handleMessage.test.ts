@@ -24,7 +24,10 @@ const mockCreateRoom = roomManagement.createRoom as jest.MockedFunction<
 const mockGetRoomByCode = roomManagement.getRoomByCode as jest.MockedFunction<
   typeof roomManagement.getRoomByCode
 >;
-const mockSubmitPrediction = predictionSubmission.submitPrediction as jest.MockedFunction<typeof predictionSubmission.submitPrediction>;
+const mockSubmitPrediction =
+  predictionSubmission.submitPrediction as jest.MockedFunction<
+    typeof predictionSubmission.submitPrediction
+  >;
 
 describe('handleMessage', () => {
   const mockConnectionId = 'test-connection-123';

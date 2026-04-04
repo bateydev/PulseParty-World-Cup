@@ -55,10 +55,16 @@ describe('Cognito Authentication', () => {
       const result = await verifyJWT('valid-token');
 
       expect(result).toEqual(mockPayload);
-      expect(mockJwtDecode).toHaveBeenCalledWith('valid-token', { complete: true });
-      expect(mockJwtVerify).toHaveBeenCalledWith('valid-token', 'mock-public-key', {
-        algorithms: ['RS256'],
+      expect(mockJwtDecode).toHaveBeenCalledWith('valid-token', {
+        complete: true,
       });
+      expect(mockJwtVerify).toHaveBeenCalledWith(
+        'valid-token',
+        'mock-public-key',
+        {
+          algorithms: ['RS256'],
+        }
+      );
     });
 
     it('should reject expired JWT token', async () => {
@@ -77,13 +83,17 @@ describe('Cognito Authentication', () => {
 
       mockJwtVerify.mockReturnValue(mockPayload as any);
 
-      await expect(verifyJWT('expired-token')).rejects.toThrow('Token has expired');
+      await expect(verifyJWT('expired-token')).rejects.toThrow(
+        'Token has expired'
+      );
     });
 
     it('should reject token with invalid format', async () => {
       mockJwtDecode.mockReturnValue(null);
 
-      await expect(verifyJWT('invalid-token')).rejects.toThrow('Invalid token format');
+      await expect(verifyJWT('invalid-token')).rejects.toThrow(
+        'Invalid token format'
+      );
     });
 
     it('should reject token without key ID', async () => {
@@ -93,7 +103,9 @@ describe('Cognito Authentication', () => {
         signature: 'test-signature',
       });
 
-      await expect(verifyJWT('token-without-kid')).rejects.toThrow('Token missing key ID');
+      await expect(verifyJWT('token-without-kid')).rejects.toThrow(
+        'Token missing key ID'
+      );
     });
   });
 
@@ -195,7 +207,8 @@ describe('Cognito Authentication', () => {
           PK: 'USER#auth-cognito-user-123',
           SK: 'METADATA',
         },
-        UpdateExpression: 'SET displayName = :displayName, updatedAt = :updatedAt',
+        UpdateExpression:
+          'SET displayName = :displayName, updatedAt = :updatedAt',
         ExpressionAttributeValues: {
           ':displayName': 'Updated Name',
           ':updatedAt': expect.any(String),

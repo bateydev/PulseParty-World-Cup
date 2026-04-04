@@ -2,16 +2,22 @@
  * Unit tests for Wrapped Recap Generation
  */
 
-import {generateWrappedRecap, getUserRecaps} from './wrappedRecapGeneration';
+import { generateWrappedRecap, getUserRecaps } from './wrappedRecapGeneration';
 import * as dynamodb from '../utils/dynamodb';
 import { UserScore, Prediction, WrappedRecap } from '../types';
 
 // Mock the dynamodb utilities
 jest.mock('../utils/dynamodb');
 
-const mockGetItem = dynamodb.getItem as jest.MockedFunction<typeof dynamodb.getItem>;
-const mockPutItem = dynamodb.putItem as jest.MockedFunction<typeof dynamodb.putItem>;
-const mockQueryItems = dynamodb.queryItems as jest.MockedFunction<typeof dynamodb.queryItems>;
+const mockGetItem = dynamodb.getItem as jest.MockedFunction<
+  typeof dynamodb.getItem
+>;
+const mockPutItem = dynamodb.putItem as jest.MockedFunction<
+  typeof dynamodb.putItem
+>;
+const mockQueryItems = dynamodb.queryItems as jest.MockedFunction<
+  typeof dynamodb.queryItems
+>;
 
 describe('Wrapped Recap Generation', () => {
   beforeEach(() => {
@@ -322,9 +328,9 @@ describe('Wrapped Recap Generation', () => {
 
       mockGetItem.mockResolvedValueOnce(null);
 
-      await expect(generateWrappedRecap(userId, roomId, matchId)).rejects.toThrow(
-        `Score not found for user ${userId} in room ${roomId}`
-      );
+      await expect(
+        generateWrappedRecap(userId, roomId, matchId)
+      ).rejects.toThrow(`Score not found for user ${userId} in room ${roomId}`);
     });
   });
 
@@ -332,7 +338,9 @@ describe('Wrapped Recap Generation', () => {
     it('should retrieve and sort user recaps by creation date', async () => {
       const userId = 'user-123';
 
-      const mockRecaps: Array<WrappedRecap & { PK: string; SK: string; createdAt: string }> = [
+      const mockRecaps: Array<
+        WrappedRecap & { PK: string; SK: string; createdAt: string }
+      > = [
         {
           PK: `USER#${userId}`,
           SK: 'RECAP#match1#room1',

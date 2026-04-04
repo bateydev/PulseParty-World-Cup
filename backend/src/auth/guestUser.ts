@@ -28,11 +28,13 @@ interface UserEntity {
 /**
  * Generate a guest user with temporary ID and display name
  * Requirements: 7.1, 7.2
- * 
+ *
  * @param locale - Optional locale for the guest user (defaults to 'en')
  * @returns GuestUser object with userId, displayName, and metadata
  */
-export async function generateGuestUser(locale: string = 'en'): Promise<GuestUser> {
+export async function generateGuestUser(
+  locale: string = 'en'
+): Promise<GuestUser> {
   // Generate unique guest user ID using timestamp and random bytes
   const timestamp = Date.now();
   const randomSuffix = randomBytes(4).toString('hex');
@@ -42,7 +44,8 @@ export async function generateGuestUser(locale: string = 'en'): Promise<GuestUse
   const displayName = generateGuestDisplayName();
 
   // Calculate TTL: 24 hours from now (in Unix timestamp seconds)
-  const ttlSeconds = Math.floor(Date.now() / 1000) + (GUEST_SESSION_TTL_HOURS * 60 * 60);
+  const ttlSeconds =
+    Math.floor(Date.now() / 1000) + GUEST_SESSION_TTL_HOURS * 60 * 60;
 
   const guestUser: GuestUser = {
     userId,
@@ -84,18 +87,43 @@ export async function generateGuestUser(locale: string = 'en'): Promise<GuestUse
  */
 function generateGuestDisplayName(): string {
   const adjectives = [
-    'Swift', 'Brave', 'Clever', 'Mighty', 'Quick',
-    'Bold', 'Fierce', 'Agile', 'Sharp', 'Bright',
-    'Cool', 'Epic', 'Wild', 'Keen', 'Wise',
+    'Swift',
+    'Brave',
+    'Clever',
+    'Mighty',
+    'Quick',
+    'Bold',
+    'Fierce',
+    'Agile',
+    'Sharp',
+    'Bright',
+    'Cool',
+    'Epic',
+    'Wild',
+    'Keen',
+    'Wise',
   ];
 
   const nouns = [
-    'Tiger', 'Eagle', 'Lion', 'Falcon', 'Wolf',
-    'Hawk', 'Bear', 'Fox', 'Panther', 'Cheetah',
-    'Dragon', 'Phoenix', 'Shark', 'Viper', 'Raven',
+    'Tiger',
+    'Eagle',
+    'Lion',
+    'Falcon',
+    'Wolf',
+    'Hawk',
+    'Bear',
+    'Fox',
+    'Panther',
+    'Cheetah',
+    'Dragon',
+    'Phoenix',
+    'Shark',
+    'Viper',
+    'Raven',
   ];
 
-  const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randomAdjective =
+    adjectives[Math.floor(Math.random() * adjectives.length)];
   const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
   const randomNumber = Math.floor(Math.random() * 1000);
 

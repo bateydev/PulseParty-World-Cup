@@ -64,7 +64,9 @@ export async function handler(event: unknown): Promise<IngestionResult> {
       }
     } else {
       // Use simulator mode
-      console.log('Using simulator mode (API key not configured or simulator forced)');
+      console.log(
+        'Using simulator mode (API key not configured or simulator forced)'
+      );
       mode = 'simulator';
     }
 
@@ -126,7 +128,8 @@ export async function handler(event: unknown): Promise<IngestionResult> {
 
     // Return result
     const result: IngestionResult = {
-      success: eventsPublished > 0 || (eventsFetched === 0 && errors.length === 0),
+      success:
+        eventsPublished > 0 || (eventsFetched === 0 && errors.length === 0),
       mode,
       eventsFetched,
       eventsNormalized,
@@ -156,7 +159,9 @@ export async function handler(event: unknown): Promise<IngestionResult> {
  * Run simulator and return a batch of events
  * In simulator mode, we return a few events per invocation to simulate real-time flow
  */
-async function runSimulator(): Promise<Awaited<ReturnType<typeof fetchLiveMatchEvents>>> {
+async function runSimulator(): Promise<
+  Awaited<ReturnType<typeof fetchLiveMatchEvents>>
+> {
   return new Promise((resolve) => {
     const simulator = createSimulator({
       enabled: true,

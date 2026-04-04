@@ -4,7 +4,14 @@
  */
 
 export { handler } from './handler';
-export { fetchLiveMatchEvents, fetchLiveFixtures, fetchFixtureEvents } from './apiFootball';
+export {
+  fetchLiveMatchEvents,
+  fetchLiveFixtures,
+  fetchFixtureEvents,
+} from './apiFootball';
 export { createSimulator } from './simulator';
 export { normalizeEvent, normalizeEvents, getValidEvents } from './normalizer';
-export { publishToEventBridge, publishEventsToEventBridge } from './eventBridgePublisher';
+export {
+  publishToEventBridge,
+  publishEventsToEventBridge,
+} from './eventBridgePublisher';

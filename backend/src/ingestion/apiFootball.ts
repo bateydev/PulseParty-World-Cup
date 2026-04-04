@@ -22,6 +22,11 @@ export interface ApiFootballFixture {
       elapsed: number | null;
     };
   };
+  league: {
+    id: number;
+    name: string;
+    country: string;
+  };
   teams: {
     home: { id: number; name: string };
     away: { id: number; name: string };
@@ -143,7 +148,9 @@ export function transformApiFootballEvent(
 ): MatchEvent | null {
   const matchId = `match-${fixture.fixture.id}`;
   const teamId = `team-${apiEvent.team.id}`;
-  const playerId = apiEvent.player?.id ? `player-${apiEvent.player.id}` : undefined;
+  const playerId = apiEvent.player?.id
+    ? `player-${apiEvent.player.id}`
+    : undefined;
   const timestamp = new Date().toISOString();
 
   // Determine event type based on API-Football type and detail
@@ -284,7 +291,9 @@ const processedEventIds = new Set<string>();
  * @returns Array of new events only
  */
 export function filterNewEvents(events: MatchEvent[]): MatchEvent[] {
-  const newEvents = events.filter((event) => !processedEventIds.has(event.eventId));
+  const newEvents = events.filter(
+    (event) => !processedEventIds.has(event.eventId)
+  );
 
   // Mark new events as processed
   newEvents.forEach((event) => processedEventIds.add(event.eventId));

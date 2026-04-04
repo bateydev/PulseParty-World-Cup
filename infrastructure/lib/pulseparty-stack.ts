@@ -363,8 +363,8 @@ export class PulsePartyStack extends cdk.Stack {
       environment: {
         TABLE_NAME: this.table.tableName,
         EVENT_BUS_NAME: this.eventBus.eventBusName,
-        API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '', // Set via environment or leave empty for simulator mode
-        SIMULATOR_MODE: process.env.SIMULATOR_MODE || 'true', // Default to simulator mode
+        API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '',
+        SIMULATOR_MODE: process.env.SIMULATOR_MODE || 'false',
       },
       timeout: cdk.Duration.seconds(30),
       memorySize: 512,
@@ -600,18 +600,18 @@ export class PulsePartyStack extends cdk.Stack {
 
     // ========================================
     // Scheduled Rule for Ingestion Lambda
-    // Polls API-Football every 30 seconds for live match data
+    // Polls API-Football every 1 minute for live match data
     // ========================================
 
-    // Rule 5: Trigger Ingestion Lambda every 30 seconds
-    // Note: You can disable this rule or adjust the schedule to save API quota
+    // Rule 5: Trigger Ingestion Lambda every 1 minute
+    // DISABLED: To save API quota, use simulator mode instead
     const ingestionScheduleRule = new events.Rule(this, 'IngestionScheduleRule', {
       ruleName: 'PulseParty-IngestionSchedule',
-      description: 'Trigger Ingestion Lambda every 30 seconds to fetch live match data',
-      // Poll every 30 seconds (2 requests/minute = 120 requests/hour)
+      description: 'Trigger Ingestion Lambda every 1 minute to fetch live match data',
+      // Poll every 1 minute (1 request/minute = 60 requests/hour = 1,440 requests/day)
       // For production, consider polling only during match hours to save API quota
-      schedule: events.Schedule.rate(cdk.Duration.seconds(30)),
-      enabled: true, // Set to false to disable automatic polling
+      schedule: events.Schedule.rate(cdk.Duration.minutes(1)),
+      enabled: false, // DISABLED to save API quota - use simulator mode
     });
     ingestionScheduleRule.addTarget(
       new targets.LambdaFunction(this.ingestionFunction, {
@@ -856,6 +856,157 @@ export class PulsePartyStack extends cdk.Stack {
       value: this.defaultFunction.functionArn,
       description: 'Default handler Lambda function ARN',
       exportName: 'PulsePartyDefaultFunctionArn',
+    });
+
+    // ========================================
+    // HTTP API Gateway for Match API
+    // Provides REST endpoints for fetching available matches
+    // ========================================
+
+    // Match API Lambda - Returns available matches from cache
+    const matchApiFunction = new lambda.Function(this, 'MatchApiFunction', {
+      functionName: 'PulseParty-MatchApi',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'matches/handler.handler',
+      code: lambda.Code.fromAsset('../backend/dist'),
+      role: lambdaExecutionRole,
+      environment: {
+        TABLE_NAME: this.table.tableName,
+        API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '',
+      },
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 512,
+      description: 'Match API - Returns available matches from cache or demo data',
+    });
+
+    // Match Cache Refresh Lambda - Scheduled to refresh match cache
+    const matchCacheRefreshFunction = new lambda.Function(
+      this,
+      'MatchCacheRefreshFunction',
+      {
+        functionName: 'PulseParty-MatchCacheRefresh',
+        runtime: lambda.Runtime.NODEJS_20_X,
+        handler: 'matches/cacheRefreshHandler.handler',
+        code: lambda.Code.fromAsset('../backend/dist'),
+        role: lambdaExecutionRole,
+        environment: {
+          TABLE_NAME: this.table.tableName,
+          API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '',
+        },
+        timeout: cdk.Duration.seconds(30),
+        memorySize: 512,
+        description:
+          'Match Cache Refresh - Fetches matches from API-Football and caches in DynamoDB',
+      }
+    );
+
+    // Schedule to refresh match cache every 15 minutes
+    // DISABLED: To save API quota, use demo matches instead
+    const matchCacheRefreshRule = new events.Rule(
+      this,
+      'MatchCacheRefreshRule',
+      {
+        ruleName: 'PulseParty-MatchCacheRefresh',
+        description: 'Trigger match cache refresh every 15 minutes',
+        schedule: events.Schedule.rate(cdk.Duration.minutes(15)),
+        enabled: false, // DISABLED to save API quota
+      }
+    );
+    matchCacheRefreshRule.addTarget(
+      new targets.LambdaFunction(matchCacheRefreshFunction, {
+        retryAttempts: 2,
+      })
+    );
+
+    // HTTP API Gateway
+    const httpApi = new apigatewayv2.CfnApi(this, 'HttpApi', {
+      name: 'PulsePartyHttpApi',
+      protocolType: 'HTTP',
+      description: 'HTTP API for PulseParty REST endpoints',
+      corsConfiguration: {
+        allowOrigins: ['*'],
+        allowMethods: ['GET', 'POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+        maxAge: 300,
+      },
+    });
+
+    // HTTP API Stage
+    const httpApiStage = new apigatewayv2.CfnStage(this, 'HttpApiStage', {
+      apiId: httpApi.ref,
+      stageName: 'prod',
+      autoDeploy: true,
+      description: 'Production stage for HTTP API',
+    });
+
+    // Lambda integration for Match API
+    const matchApiIntegration = new apigatewayv2.CfnIntegration(
+      this,
+      'MatchApiIntegration',
+      {
+        apiId: httpApi.ref,
+        integrationType: 'AWS_PROXY',
+        integrationUri: matchApiFunction.functionArn,
+        payloadFormatVersion: '2.0',
+        description: 'Integration for Match API Lambda',
+      }
+    );
+
+    // Route: GET /matches
+    new apigatewayv2.CfnRoute(this, 'GetMatchesRoute', {
+      apiId: httpApi.ref,
+      routeKey: 'GET /matches',
+      target: `integrations/${matchApiIntegration.ref}`,
+    });
+
+    // Route: POST /matches/refresh
+    new apigatewayv2.CfnRoute(this, 'RefreshMatchesRoute', {
+      apiId: httpApi.ref,
+      routeKey: 'POST /matches/refresh',
+      target: `integrations/${matchApiIntegration.ref}`,
+    });
+
+    // Grant API Gateway permission to invoke Match API Lambda
+    matchApiFunction.addPermission('ApiGatewayInvoke', {
+      principal: new iam.ServicePrincipal('apigateway.amazonaws.com'),
+      sourceArn: `arn:aws:execute-api:${this.region}:${this.account}:${httpApi.ref}/*`,
+    });
+
+    // Outputs for HTTP API
+    new cdk.CfnOutput(this, 'HttpApiId', {
+      value: httpApi.ref,
+      description: 'HTTP API Gateway ID',
+      exportName: 'PulsePartyHttpApiId',
+    });
+
+    new cdk.CfnOutput(this, 'HttpApiEndpoint', {
+      value: `https://${httpApi.ref}.execute-api.${this.region}.amazonaws.com/prod`,
+      description: 'HTTP API endpoint URL',
+      exportName: 'PulsePartyHttpApiEndpoint',
+    });
+
+    new cdk.CfnOutput(this, 'MatchApiUrl', {
+      value: `https://${httpApi.ref}.execute-api.${this.region}.amazonaws.com/prod/matches`,
+      description: 'Match API endpoint URL',
+      exportName: 'PulsePartyMatchApiUrl',
+    });
+
+    new cdk.CfnOutput(this, 'MatchApiFunctionArn', {
+      value: matchApiFunction.functionArn,
+      description: 'Match API Lambda function ARN',
+      exportName: 'PulsePartyMatchApiFunctionArn',
+    });
+
+    new cdk.CfnOutput(this, 'MatchCacheRefreshFunctionArn', {
+      value: matchCacheRefreshFunction.functionArn,
+      description: 'Match Cache Refresh Lambda function ARN',
+      exportName: 'PulsePartyMatchCacheRefreshFunctionArn',
+    });
+
+    new cdk.CfnOutput(this, 'MatchCacheRefreshRuleArn', {
+      value: matchCacheRefreshRule.ruleArn,
+      description: 'Match Cache Refresh EventBridge rule ARN',
+      exportName: 'PulsePartyMatchCacheRefreshRuleArn',
     });
 
     // Update Lambda environment variables with WebSocket API endpoint

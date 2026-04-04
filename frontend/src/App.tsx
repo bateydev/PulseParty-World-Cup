@@ -66,9 +66,21 @@ function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [showConnectionBanner, setShowConnectionBanner] = useState(true);
   const { user, setUser, connectWebSocket, wsConnected, reconnecting } =
     useAppStore();
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
+
+  // Auto-hide connection banner after 5 seconds when connected
+  useEffect(() => {
+    if (wsConnected && showConnectionBanner) {
+      const timer = setTimeout(() => {
+        setShowConnectionBanner(false);
+      }, 5000); // Hide after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [wsConnected, showConnectionBanner]);
 
   // Initialize guest user
   useEffect(() => {
@@ -294,10 +306,10 @@ function App() {
 
       {/* Main Content with padding for fixed header and nav */}
       <main className="max-w-7xl mx-auto px-4 pt-20 pb-24">
-        {/* Connection Status Banner */}
-        {wsConnected ? (
+        {/* Connection Status Banner - Auto-hides after 5 seconds */}
+        {showConnectionBanner && wsConnected && (
           <div
-            className={`mb-4 rounded-2xl p-4 backdrop-blur-sm border ${
+            className={`mb-4 rounded-2xl p-4 backdrop-blur-sm border animate-slideDown ${
               isDark
                 ? 'bg-green-500/10 border-green-500/20 text-green-300'
                 : 'bg-green-500/10 border-green-500/20 text-green-700'
@@ -305,16 +317,24 @@ function App() {
           >
             <div className="flex items-start space-x-3">
               <span className="text-2xl">✅</span>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold mb-1">Connected to AWS Backend</p>
                 <p className="text-sm opacity-90">
                   WebSocket connection established. Ready to create or join
                   rooms!
                 </p>
               </div>
+              <button
+                onClick={() => setShowConnectionBanner(false)}
+                className="text-sm opacity-70 hover:opacity-100"
+              >
+                ✕
+              </button>
             </div>
           </div>
-        ) : reconnecting ? (
+        )}
+        
+        {reconnecting && (
           <div
             className={`mb-4 rounded-2xl p-4 backdrop-blur-sm border ${
               isDark
@@ -332,7 +352,9 @@ function App() {
               </div>
             </div>
           </div>
-        ) : (
+        )}
+        
+        {!wsConnected && !reconnecting && (
           <div
             className={`mb-4 rounded-2xl p-4 backdrop-blur-sm border ${
               isDark

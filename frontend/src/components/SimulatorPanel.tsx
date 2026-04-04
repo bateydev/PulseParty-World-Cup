@@ -30,6 +30,15 @@ export function SimulatorPanel({ matchApiUrl }: SimulatorPanelProps) {
       }
 
       const data = await response.json();
+      
+      if (data.cached === 0) {
+        setMessage(
+          `⚠️ Simulator returned 0 matches. Check Lambda logs or try again.`
+        );
+        setIsSimulating(false);
+        return;
+      }
+      
       setMessage(
         `✅ Simulator started! Cached ${data.cached || 0} simulated matches.`
       );

@@ -55,7 +55,7 @@ export const PWAStatusIndicator: React.FC = () => {
 
       {/* Update Available Notification */}
       {status.needsUpdate && (
-        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 max-w-sm">
+        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-[100] max-w-sm">
           <div className="flex items-start gap-3">
             <svg
               className="w-6 h-6 flex-shrink-0 mt-0.5"
@@ -86,8 +86,8 @@ export const PWAStatusIndicator: React.FC = () => {
         </div>
       )}
 
-      {/* Reconnection Indicator */}
-      {status.isOnline && (
+      {/* Reconnection Indicator - Shows briefly when coming back online */}
+      {status.isOnline && !status.wasOffline && (
         <div className="fixed top-0 left-0 right-0 bg-green-500 text-white px-4 py-2 text-center text-sm font-medium z-50 animate-fade-in-out">
           <span className="inline-flex items-center gap-2">
             <svg

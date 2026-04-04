@@ -8,6 +8,7 @@
 interface EnvironmentConfig {
   websocketUrl: string;
   apiUrl: string;
+  matchApiUrl: string;
   isDevelopment: boolean;
   isProduction: boolean;
   enableDebugLogs: boolean;
@@ -34,9 +35,15 @@ function getEnvironmentConfig(): EnvironmentConfig {
       ? 'http://localhost:3001' // Local development API
       : 'https://api.pulseparty.example.com'); // Production API Gateway
 
+  // Match API URL from environment variable or default
+  const matchApiUrl =
+    import.meta.env.VITE_MATCH_API_URL ||
+    `${apiUrl}/matches`; // Default to apiUrl + /matches
+
   return {
     websocketUrl,
     apiUrl,
+    matchApiUrl,
     isDevelopment,
     isProduction,
     enableDebugLogs: isDevelopment,
@@ -52,6 +59,7 @@ if (config.isDevelopment) {
   console.log('🔧 Environment Configuration:', {
     websocketUrl: config.websocketUrl,
     apiUrl: config.apiUrl,
+    matchApiUrl: config.matchApiUrl,
     isDevelopment: config.isDevelopment,
     isProduction: config.isProduction,
   });

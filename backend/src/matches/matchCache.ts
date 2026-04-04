@@ -58,6 +58,7 @@ function transformFixture(fixture: ApiFootballFixture): CachedMatch {
 /**
  * Fetch matches from API-Football and cache in DynamoDB
  * Called by scheduled Lambda every 15 minutes
+ * Supports simulator mode for testing without API quota
  */
 export async function refreshMatchCache(): Promise<{
   cached: number;
@@ -67,6 +68,90 @@ export async function refreshMatchCache(): Promise<{
   let cached = 0;
 
   try {
+    // Check if simulator mode is enabled
+    const simulatorMode = process.env.SIMULATOR_MODE === 'true';
+
+    if (simulatorMode) {
+      console.log('Simulator mode enabled - generating simulated matches...');
+      
+      // Generate 3-5 simulated matches
+      const simulatedMatches: CachedMatch[] = [
+        {
+          matchId: 'match-sim-1',
+          homeTeam: 'Manchester United',
+          awayTeam: 'Liverpool',
+          league: 'Premier League',
+          startTime: new Date().toISOString(),
+          status: 'live',
+          homeScore: 1,
+          awayScore: 1,
+        },
+        {
+          matchId: 'match-sim-2',
+          homeTeam: 'Real Madrid',
+          awayTeam: 'Barcelona',
+          league: 'La Liga',
+          startTime: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
+          status: 'scheduled',
+        },
+        {
+          matchId: 'match-sim-3',
+          homeTeam: 'Brazil',
+          awayTeam: 'Argentina',
+          league: 'International Friendly',
+          startTime: new Date(Date.now() + 7200000).toISOString(), // 2 hours from now
+          status: 'scheduled',
+        },
+        {
+          matchId: 'match-sim-4',
+          homeTeam: 'Bayern Munich',
+          awayTeam: 'Borussia Dortmund',
+          league: 'Bundesliga',
+          startTime: new Date().toISOString(),
+          status: 'live',
+          homeScore: 2,
+          awayScore: 0,
+        },
+        {
+          matchId: 'match-sim-5',
+          homeTeam: 'France',
+          awayTeam: 'Germany',
+          league: 'UEFA Nations League',
+          startTime: new Date(Date.now() + 10800000).toISOString(), // 3 hours from now
+          status: 'scheduled',
+        },
+      ];
+
+      const ttl = Math.floor(Date.now() / 1000) + CACHE_TTL_HOURS * 3600;
+
+      for (const match of simulatedMatches) {
+        try {
+          await docClient.send(
+            new PutCommand({
+              TableName: TABLE_NAME,
+              Item: {
+                PK: 'MATCH_CACHE',
+                SK: match.matchId,
+                ...match,
+                cachedAt: new Date().toISOString(),
+                ttl,
+              },
+            })
+          );
+
+          cached++;
+        } catch (error) {
+          const errorMsg = `Failed to cache simulated match ${match.matchId}: ${error instanceof Error ? error.message : String(error)}`;
+          console.error(errorMsg);
+          errors.push(errorMsg);
+        }
+      }
+
+      console.log(`Successfully cached ${cached} simulated matches`);
+      return { cached, errors };
+    }
+
+    // Real API mode
     console.log('Fetching live and upcoming fixtures from API-Football...');
 
     // Fetch live fixtures

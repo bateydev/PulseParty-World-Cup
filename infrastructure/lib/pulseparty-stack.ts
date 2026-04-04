@@ -873,6 +873,7 @@ export class PulsePartyStack extends cdk.Stack {
       environment: {
         TABLE_NAME: this.table.tableName,
         API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '',
+        SIMULATOR_MODE: 'true', // Enable simulator mode
       },
       timeout: cdk.Duration.seconds(10),
       memorySize: 512,
@@ -892,6 +893,7 @@ export class PulsePartyStack extends cdk.Stack {
         environment: {
           TABLE_NAME: this.table.tableName,
           API_FOOTBALL_KEY: process.env.API_FOOTBALL_KEY || '',
+          SIMULATOR_MODE: 'true', // Enable simulator mode
         },
         timeout: cdk.Duration.seconds(30),
         memorySize: 512,

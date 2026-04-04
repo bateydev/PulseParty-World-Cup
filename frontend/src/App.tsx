@@ -6,6 +6,7 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { LanguageSelector } from './components/LanguageSelector';
 import { Toast } from './components/Toast';
 import { AuthModal } from './components/AuthModal';
+import { SimulatorPanel } from './components/SimulatorPanel';
 import { useAppStore } from './store';
 import { useDarkMode } from './hooks/useDarkMode';
 import { config } from './config/environment';
@@ -506,6 +507,9 @@ function App() {
           onClose={() => setToastMessage(null)}
         />
       )}
+
+      {/* Simulator Panel - Dev Tools */}
+      <SimulatorPanel matchApiUrl={config.matchApiUrl} />
     </div>
   );
 }
